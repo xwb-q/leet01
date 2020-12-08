@@ -1,48 +1,142 @@
 package com.leet;
 
+import com.leet.CountDownLatch.CountDownLatchDemo;
+import com.leet.CountryEnum.CountryEnum;
 import com.leet.Homework.RyabkoTree;
 import com.leet.Homework.RyabkoTreeI;
 import com.leet.Homework.SlowPrefixStack;
+//import com.leet.ReadWriteLockDemo.myCache;
 import com.leet.SpinLockDemo.SpinLockDemo;
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import netscape.security.UserTarget;
 import org.omg.PortableInterceptor.INACTIVE;
 
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+//保证  写 原子性    读高并发
+class myCache{
+    private volatile HashMap<String,Object> hashMap = new HashMap<>();//  因为  hashmap更改了以后需要第一时间告诉每个线程   所以需要有可见性可见顶
+//    private Lock lock = new ReentrantLock();
+    private ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
+
+    public void put(String key,Object value){
+//        lock.lock();
+        rwlock.writeLock().lock();
+        try{
+            System.out.println(Thread.currentThread().getName()+"\t 正在写入:"+key);
+            TimeUnit.SECONDS.sleep(1);
+            hashMap.put(key,value);
+            System.out.println(Thread.currentThread().getName()+"\t 写入完成:");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            rwlock.writeLock().unlock();
+        }
+
+
+
+    }
+
+    public void get(String key){
+        rwlock.readLock().lock();
+        try{
+            System.out.println(Thread.currentThread().getName()+"\t 开始读取数据:");
+            TimeUnit.MICROSECONDS.sleep(300);
+            Object res = hashMap.get(key);
+            System.out.println(Thread.currentThread().getName()+"\t 读取数据完成:"+res);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            rwlock.readLock().unlock();
+        }
+
+    }
+}
 
 public class Main {
 
     public static void main(String[] args) {
-        SpinLockDemo spinLockDemo = new SpinLockDemo();
 
-        new Thread( () ->{
-            spinLockDemo.myLock();
+        CountDownLatchDemo c = new CountDownLatchDemo();
+        CountDownLatch countDownLatch = new CountDownLatch(6);
 
-            try {
-                TimeUnit.SECONDS.sleep(5);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            spinLockDemo.unLock();
-        },"AAA").start();
+        for(int i = 1;i <= 6;i++){
+             new Thread(()->{
+                    c.goHome();
+                    countDownLatch.countDown();
+             }, CountryEnum.findCountry(i).getRetName()).start();
+        }
 
         try {
-            TimeUnit.SECONDS.sleep(1);
+            countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        System.out.println("石阡 gohome ");
 
-        new Thread( () ->{
-            spinLockDemo.myLock();
+//        myCache m = new myCache();
+//
+//        for(int i = 1;i<=5 ;i++){
+//            final int finalI = i;
+//
+//            new Thread(()->{
+//                m.put(finalI +"", finalI +"");
+//            },finalI+"").start();
+//
+//        }
+//        try {
+//            TimeUnit.MICROSECONDS.sleep(300);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+////--------------------------------------------
+//        for(int i = 1;i<=5 ;i++){
+//            final int finalI = i;
+//
+//            new Thread(()->{
+//                m.get(finalI+"");
+//            },finalI+"").start();
+//
+//        }
 
-            spinLockDemo.unLock();
-        },"BBB").start();
 
-        return;
+//        SpinLockDemo spinLockDemo = new SpinLockDemo();
+//
+//        new Thread( () ->{
+//            spinLockDemo.myLock();
+//
+//            try {
+//                TimeUnit.SECONDS.sleep(5);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+//            spinLockDemo.unLock();
+//        },"AAA").start();
+//
+//        try {
+//            TimeUnit.SECONDS.sleep(1);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//
+//        new Thread( () ->{
+//            spinLockDemo.myLock();
+//
+//            spinLockDemo.unLock();
+//        },"BBB").start();
+//
+//        return;
     }
 
 
