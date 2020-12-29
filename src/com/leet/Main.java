@@ -1,253 +1,1019 @@
 package com.leet;
 
-import java.awt.event.TextEvent;
+import netscape.security.UserTarget;
+import sun.security.krb5.internal.PAData;
+
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
-//import com.leet.ReadWriteLockDemo.myCache;
-
-//保证  写 原子性    读高并发
-class myCache{
-    private volatile HashMap<String,Object> hashMap = new HashMap<>();//  因为  hashmap更改了以后需要第一时间告诉每个线程   所以需要有可见性可见顶
-//    private Lock lock = new ReentrantLock();
-    private ReentrantReadWriteLock rwlock = new ReentrantReadWriteLock();
-
-    public void put(String key,Object value){
-//        lock.lock();
-        rwlock.writeLock().lock();
+class ShareData{
+    private int count = 1; // A 1    B 2   C 3
+    private Lock lock = new ReentrantLock();
+    private Condition c1 = lock.newCondition();
+    private Condition c2 = lock.newCondition();
+    private Condition c3 = lock.newCondition();
+    public void myprint(){
+        lock.lock();
         try{
-            System.out.println(Thread.currentThread().getName()+"\t 正在写入:"+key);
-            TimeUnit.SECONDS.sleep(1);
-            hashMap.put(key,value);
-            System.out.println(Thread.currentThread().getName()+"\t 写入完成:");
+            while (count != 1)
+            {
+                System.out.println(count+Thread.currentThread().getName());
+                c1.await();
+            }
+            for(int i = 1;i <= 5*count;i++){
+                System.out.println(Thread.currentThread().getName()+"\t"+i);
+            }
+            if(count==1){
+                count = 2;
+                c2.signal();
+            }
+            else if(count == 2){
+                count = 3;
+                c3.signal();
+            } else {
+                count = 1;
+                c1.signal();
+            }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            rwlock.writeLock().unlock();
+            lock.unlock();
         }
-
-
-
     }
-
-    public void get(String key){
-        rwlock.readLock().lock();
+    public void print5(){
+        lock.lock();
         try{
-            System.out.println(Thread.currentThread().getName()+"\t 开始读取数据:");
-            TimeUnit.MICROSECONDS.sleep(300);
-            Object res = hashMap.get(key);
-            System.out.println(Thread.currentThread().getName()+"\t 读取数据完成:"+res);
+
+            while (count!=1){
+                c1.await();
+            }
+            for(int i = 1;i<=5;i++){
+                System.out.println(Thread.currentThread().getName()+"\t"+i);
+            }
+            count = 2;
+            c2.signal();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
-            rwlock.readLock().unlock();
+            lock.unlock();
         }
+    }
+    public void print10(){
+        lock.lock();
+        try{
 
+            while (count!=2){
+                c2.await();
+            }
+            for(int i = 1;i<=10;i++){
+                System.out.println(Thread.currentThread().getName()+"\t"+i);
+            }
+            count = 3;
+            c3.signal();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
+    }
+    public void print15(){
+        lock.lock();
+        try{
+
+            while (count!=3){
+                c3.await();
+            }
+            for(int i = 1;i<=15;i++){
+                System.out.println(Thread.currentThread().getName()+"\t"+i);
+            }
+            count = 1;
+            c1.signal();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } finally {
+            lock.unlock();
+        }
     }
 }
-
 public class Main {
-
     public static void main(String[] args) {
 
-//        int[] preorder = new int[]{1,2,4,5,7,3,6,8};
-//        int[] inorder = new int[]{4,2,7,5,1,3,8,6};
-//
-//        BuildTreeByPre_Inorder.TreeNode res = BuildTreeByPre_Inorder.buildTree(preorder, inorder);
-//        return;
-        PopulatingNextRightPoint.Node node1 = new PopulatingNextRightPoint.Node(1);
-        PopulatingNextRightPoint.Node node2 = new PopulatingNextRightPoint.Node(2);
-        PopulatingNextRightPoint.Node node3 = new PopulatingNextRightPoint.Node(3);
-        PopulatingNextRightPoint.Node node4 = new PopulatingNextRightPoint.Node(4);
-        PopulatingNextRightPoint.Node node5 = new PopulatingNextRightPoint.Node(5);
-        PopulatingNextRightPoint.Node node6 = new PopulatingNextRightPoint.Node(6);
-        PopulatingNextRightPoint.Node node7 = new PopulatingNextRightPoint.Node(7);
-//        PopulatingNextRightPoint.Node node8 = new PopulatingNextRightPoint.Node(8);
-//        PopulatingNextRightPoint.Node node9 = new PopulatingNextRightPoint.Node(9);
-//        PopulatingNextRightPoint.Node node10 = new PopulatingNextRightPoint.Node(10);
-//        PopulatingNextRightPoint.Node node11 = new PopulatingNextRightPoint.Node(11);
-
-        node1.left = node2;
-        node1.right = node3;
-        node2.left = node4;
-        node2.right = node5;
-        node3.left = node6;
-        node3.right = node7;
-//        node1.right = node9;
-//        node2.left = node3;
-//        node3.left = node4;
-//        node3.right = node5;
-//        node2.right = node6;
-//        node6.left = node7;
-//        node6.right = node8;
-//        node9.left = node10;
-//        node9.right = node11;
-
-        PopulatingNextRightPoint.connect(node1);
-//        node1.left = node2;
-//        node1.left = node2;
+//        10000000000
+//        2147483647
+//        List<Integer> list = LexicalOrder.lexicalOrder(13);
+//        [43024,99908]
+//[1864]
+        int res = NumTriplets.numTriplets(new int[]{43024,99908},new int[]{1864});
+//        System.out.println(43024*99908);
+        System.out.println(res);
         return;
-
     }
 
-    public static class SumRoottoLeaf{
+    /**
+     *三元组 (i, j, k) ，如果 nums1[i]2 == nums2[j] * nums2[k] 其中 0 <= i < nums1.length 且 0 <= j < k < nums2.length
+     * 三元组 (i, j, k) ，如果 nums2[i]2 == nums1[j] * nums1[k] 其中 0 <= i < nums2.length 且 0 <= j < k < nums1.length
+     */
+    public static class NumTriplets{
+        public static int numTriplets(int[] nums1, int[] nums2) {
+            Arrays.sort(nums1);
+            Arrays.sort(nums2);
+            return helper(nums1,nums2)+helper(nums2,nums1);
+
+        }
+        public static int helper(int[] nums1,int[] nums2){
+            int sum = 0;
+            int pretag = -1;
+            int presum = 0;
+            for(int i = 0;i<nums1.length;i++){
+                if(nums1[i]==pretag){
+                    sum += presum;
+                    continue;
+                }
+                presum = 0;
+                pretag = nums1[i];
+                int j = 0,k = nums2.length-1;
+                long tag = nums1[i];
+                tag *= tag;
+
+                while (j<k){
+                    long tag1 = nums2[j];
+                    tag1 = tag1 * nums2[k];
+                    if(tag>tag1)
+                        j++;
+                    else if(tag<tag1)
+                        k--;
+                    else{
+                        presum++;
+                        if(nums2[j]==nums2[k]){
+                            presum = presum-1+( (k-j+1)*(k-j) ) /2;
+                            break;
+                        }
+                        int jj = 1;
+                        while (j+jj<k&&nums2[j]==nums2[j+jj]){
+                            jj++;
+                            presum++;
+                        }
+//                        j += jj-1);
+                        int kk = 1;
+                        while (j<k-kk&&nums2[k]==nums2[k-kk]){
+                            kk++;
+                            presum++;
+                        }
+//                        k -=(kk-1);
+//                        j += jj;
+                        k--;
+                        j++;
+                    }
+                }
+                sum += presum;
+            }
+            return sum;
+        }
+    }//1577   6ms 92.07
+
+
+
+
+
+
+
+    public static class LexicalOrder{
+        static class Trie{
+            public TrieNode root;
+
+            class TrieNode{
+                int num;
+                TrieNode[] children = new TrieNode[10];
+//                boolean isLast = false;
+                public TrieNode(int num){
+                    this.num = num;
+                }
+                public void insert(int num){
+                    char[] cs = (num+"").toCharArray();
+                    int i = 0;
+                    TrieNode p =root;
+                    for(char c:cs){
+                        i = c-'0';
+                        TrieNode child = p.children[i];
+                        if(child==null){
+                            child = new TrieNode(i);
+                            p.children[i] = child;
+                        }
+                        p = child;
+                    }
+//                    p.isLast = true;
+                }
+
+                public List<Integer> getNum(){
+                    TrieNode p = root;
+                    List<Integer> res = new ArrayList<>();
+                    for(TrieNode child:root.children)
+                        if(child!=null)
+                            dfs(res,child,0);
+                    return res;
+                }
+                public void dfs(List<Integer> res,TrieNode root,int num){
+                    num = num * 10 + root.num;
+//                    if(root.isLast)
+                    res.add(num);
+
+                    for(TrieNode child : root.children){
+                        if(child!=null)
+                            dfs(res,child,num);
+                    }
+                }
+            }
+
+            public Trie(){
+                root = new TrieNode(-1);
+            }
+        }//字典树  12ms   18%
+        public static List<Integer> lexicalOrder(int n) {
+            Trie root = new Trie();
+            while (n>0)
+                root.root.insert(n--);
+            return root.root.getNum();
+        }
+        public static List<Integer> lexicalOrderII(int n){
+            List<Integer> res = new ArrayList<>();
+            for(int i = 1;i< (n > 9?9:n);i++){
+                res.add(i);
+                helper(res,n,i*10);
+            }
+            return res;
+        }//2ms 99%
+        public static void helper(List<Integer> res,int n,int base){
+            for(int i = 0;i<10;i++){
+                if(base+i <= n){
+                    res.add(base+i);
+                    helper(res,n,(base+i)*10 );
+                }
+                else
+                    return;
+            }
+        }
+
+    }//2ms  99%
+
+    public static class MissingNumber{
+        public int missingNumber(int[] nums) {
+                int res = 0;
+                int len = nums.length;
+                for(int num : nums)
+                    res += num;
+                int tag = (len * (len-1))/2;
+                int i = res - tag;
+                return nums[nums.length-i];
+        }
+    }
+
+    public static class CountDigitOne{
+        public static int countDigitOne(int n) {
+            int res = 0;
+            for(int i = 0;i <= n;i++)
+                res += countOne(i);
+            return res;
+        }
+        public static int countOne(int n){
+            char[] cs = (n+"").toCharArray();
+            int count = 0;
+            for(char c : cs)
+                if(c=='1')
+                    count++;
+            return count;
+        }
+    }//未完待续
+
+    public static class Num{
+        public int sumNums(int n) {
+            int sum = n;
+            boolean flag = (n>0 && (sum += sumNums(sum-1) ) >0 );
+            return sum;
+        }
+    }
+
+    public static class RangeBitWiseAnd{
+        public static int rangeBitwiseAnd(int m, int n) {
+            int res = m++;
+            while (m>=0&&m<=n){
+                if(res==0)
+                    return 0;
+                res &= m;
+                m++;
+            }
+            return res;
+        }
+    }
+
+    public static class MajorityElemente{
+        public int majorityElement(int[] nums) {
+
+            int count = 0;
+            int res = 0;
+            for(int num : nums){
+                if(count==0){
+                    res = num;
+                    count = 1;
+                }else if(res == num)
+                    count++;
+                else
+                    count--;
+            }
+            return res;
+        }//摩尔投票法
+    }//1ms  99%
+
+    public static class MajorityElement{
+        public List<Integer> majorityElement(int[] nums) {
+            HashMap<Integer,Integer> map = new HashMap<>();
+            Integer count = 0;
+            int len = nums.length;
+            List<Integer> res = new ArrayList<>();
+            for(int n:nums){
+                if(res.contains(n))
+                    continue;
+                count = map.get(n);
+                if(count!=null && count+1>len/3)
+                    res.add(n);
+                map.put(n,count==null?1:count+1);
+            }
+            if(len<3)
+                for(int n:nums)
+                    if(!res.contains(n))
+                        res.add(n);
+            return res;
+        }//13ms 22.28%
+        public static List<Integer> majorityElementII(int[] nums){
+            int res1 = 0;
+            int count1 = 0;
+            List<Integer> res = new ArrayList<>();
+            int res2 = 0;
+            int count2 = 0;
+            for(int num:nums){
+                if(count1!=0&&res1==num){
+                        count1++;
+                        continue;
+                }
+
+                if(count2!=0&&res2==num){
+                    count2++;
+                    continue;
+                }
+
+                if(count1==0){
+                    res1 = num;
+                    count1 = 1;
+                    continue;
+                }
+                if(count2==0){
+                    res2 = num;
+                    count2 = 1;
+                    continue;
+                }
+                count1--;
+                count2--;
+            }
+            count1=0;
+            count2=0;
+            for(int num:nums){
+                if(num==res1)
+                  count1++;
+                else if(num==res2)
+                    count2++;
+            }
+            if(count1>nums.length/3)
+                res.add(res1);
+            if(count2>nums.length/3)
+                res.add(res2);
+            return res;
+        }//摩尔投票法
+    }
+
+    public static class BasicCalculator{
+        public static int calculate(String s) {
+            char[] cs = s.toCharArray();
+            Stack<Integer> stack = new Stack<>();
+            Stack<Integer> opts = new Stack<>();
+
+            int val = -1;
+            for(char c:cs){
+                if(c==' ')
+                    continue;
+                else if(c=='*'||c=='/'){
+                    if(val!=-1){
+                        stack.push(val);
+                        val = -1;
+                    }
+                    while (!opts.isEmpty()&&(opts.peek()==-6||opts.peek()==-1))
+                        stack.push(opts.pop());
+                    opts.push(c-'0');
+                }else if(c=='+'||c=='-'){
+                    if(val!=-1){
+                        stack.push(val);
+                        val=-1;
+                    }
+                    while (!opts.isEmpty())
+                        stack.push(opts.pop());
+                    opts.push(c-'0');
+                }
+                else{
+                    if(val==-1)
+                        val =c-'0';
+                    else
+                        val = val*10+(c-'0');
+                }
+//                    stack.push(c);
+            }
+            stack.push(val);
+            while (!opts.isEmpty())
+                stack.push(opts.pop());
+            return calRes(stack);
+        }//31ms  18%
+        public static int calRes(Stack<Integer> stack){
+            Stack<Integer> restack = new Stack<>();
+            while (!stack.isEmpty())
+                restack.push(stack.pop());
+            int k = 0;
+            while (!restack.isEmpty()){
+                k = restack.pop();
+                if(k<0){
+                    switch (k){
+                        case -5:
+                            stack.push( plus(stack.pop(),stack.pop()) );
+                            break;// +
+                        case -3:
+                            stack.push(reduce(stack.pop(),stack.pop()));
+                            break;// -
+                        case -6:
+                            stack.push(multiplication(stack.pop(),stack.pop()));
+                            break;// *
+                        case -1:
+                            stack.push(divide(stack.pop(),stack.pop()));
+                            break;// /
+                    }
+                }else
+                    stack.push(k);
+            }
+            return stack.pop();
+        }
+        public static int plus(int val1,int val2){
+            return val1+val2;
+        }
+        public static int reduce(int val1,int val2){
+            return val2-val1;
+        }
+        public static int multiplication(int val1,int val2){
+            return val1*val2;
+        }
+        public static int divide(int val1,int val2){
+            return val2/val1;
+        }
+
+        public static int calculateII(String s){
+                char[] cs = s.toCharArray();
+                Stack<Integer> numstack = new Stack<>();
+                Stack<Character> opts = new Stack<>();
+                int val = -1;
+                for(char c:cs){
+                    if(c==' ')
+                        continue;
+                    else if(c=='+'||c=='-'){
+                        if(val!=-1){
+                            numstack.push(val);
+                            val=-1;
+                        }
+                        if(opts.isEmpty()){
+                            opts.push(c);
+                            continue;
+                        }
+                        else if(opts.peek()=='*'){
+                            numstack.push( multiplication(numstack.pop(),numstack.pop()) );
+                            opts.pop();
+                        }
+                        else if(opts.peek()=='/'){
+                            numstack.push(divide(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }else if(c=='+'&& opts.peek()=='-'){
+                            numstack.push(reduce(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }else if(c=='-'&& opts.peek()=='+'){
+                            numstack.push(plus(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }else if(c=='-'&& opts.peek()=='-'){
+                            numstack.push(reduce(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }
+                        opts.push(c);
+                    }
+                    else if(c=='*'){
+                        if(val!=-1){
+                            numstack.push(val);
+                            val = -1;
+                        }
+                        if(opts.isEmpty()){
+                            opts.push(c);
+                            continue;
+                        }
+                        else if(opts.peek()=='/'){
+                            numstack.push(divide(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }
+                        opts.push(c);
+                    }
+                    else if(c=='/'){
+                        if(val!=-1){
+                            numstack.push(val);
+                            val = -1;
+                        }
+                        if(opts.isEmpty()){
+                            opts.push(c);
+                            continue;
+                        }
+                        else if(opts.peek()=='*'){
+                            numstack.push(multiplication(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }
+                        else if(opts.peek()=='/'){
+                            numstack.push(divide(numstack.pop(),numstack.pop()));
+                            opts.pop();
+                        }
+                        opts.push(c);
+                    }
+                    else {
+                        if(val==-1)
+                            val = c-'0';
+                        else val = val*10 + (c-'0');
+                    }
+                }
+                numstack.push(val);
+                while (!numstack.isEmpty()){
+                    if(opts.isEmpty())
+                        break;
+                    char c = opts.pop();
+                    switch (c){
+                        case '+':
+                            numstack.push( plus(numstack.pop(),numstack.pop()) );
+                            break;
+                        case '-':
+                            numstack.push( reduce(numstack.pop(),numstack.pop()) );
+                            break;
+                        case '*':
+                            numstack.push( multiplication(numstack.pop(),numstack.pop()) );
+                            break;
+                        case '/':
+                            numstack.push( divide(numstack.pop(),numstack.pop()) );
+                            break;
+                    }
+                }
+                return numstack.pop();
+        }//直接计算中缀表达式   不行!!!
+
+//        public static int calculateIII(String s){
+//
+//        }
+    }
+
+    public static class InvertBinaryTree{
 
 //          Definition for a binary tree node.
-        public class TreeNode {
+        public static class TreeNode {
               int val;
               TreeNode left;
               TreeNode right;
               TreeNode(int x) { val = x; }
         }
 
-        public int sumNumbers(TreeNode root) {
-            return 0;
-        }
-    }
-
-    public static class Po{
-        static class Node {
-            public int val;
-            public Node left;
-            public Node right;
-            public Node next;
-
-            public Node() {}
-
-            public Node(int _val) {
-                val = _val;
-            }
-
-            public Node(int _val, Node _left, Node _right, Node _next) {
-                val = _val;
-                left = _left;
-                right = _right;
-                next = _next;
-            }
-        }
-        public static Node connect(Node root) {
-            if(root==null) return root;
-            if(root.left!=null&&root.right!=null) root.left.next = root.right;
-            if(root.right!=null) root.right.next = getNext(root.next);
-            if(root.left!=null&&root.right==null) root.left.next = getNext(root.next);
-            connect(root.right);
-            connect(root.left);
-            return root;
-        }
-        public static Node getNext(Node node){
-            if(node==null)return null;
-            if(node.left!=null)return node.left;
-            if(node.right!=null)return node.right;
-            return getNext(node.next);
-        }
-
-        public static void helper(Queue<Node> silbs){
-            Node prenode = null,node = null;
-            Queue<Node> temqueues = new LinkedList<>();
-            if(silbs.isEmpty())return;
-            if(!silbs.isEmpty())
-                prenode = silbs.poll();
-            if(prenode.left!=null)
-                temqueues.add(prenode.left);
-            if(prenode.right!=null)
-                temqueues.add(prenode.right);
-
-            while (!silbs.isEmpty()){
-                node = silbs.poll();
-                if(node==null)
-                    continue;
-                if(node.left!=null)
-                    temqueues.add(node.left);
-                if(node.right!=null)
-                    temqueues.add(node.right);
-                prenode.next = node;
-                prenode = node;
-            }
-            if(prenode!=null)
-                prenode.next = null;
-            helper(temqueues);
-        }//1ms  69%
-
-    }//0ms 100%
-
-    public static  class PopulatingNextRightPoint{
-        static class Node {
-            public int val;
-            public Node left;
-            public Node right;
-            public Node next;
-
-            public Node() {}
-
-            public Node(int _val) {
-                val = _val;
-            }
-
-            public Node(int _val, Node _left, Node _right, Node _next) {
-                val = _val;
-                left = _left;
-                right = _right;
-                next = _next;
-            }
-        }
-        public static Node connect(Node root) {
+        public static TreeNode invertTree(TreeNode root) {
             if(root==null)
                 return root;
-            root.next = null;
-            Queue<Node> silbs = new LinkedList<>();
-//            if(root.left!=null)
-//                silbs.add(root.left);
-//            if(root.right!=null)
-//                silbs.add(root.right);
-            addElement(silbs,root);
-            helper(silbs);
+            exchangeL_R(root);
+            invertTree(root.left);
+            invertTree(root.right);
             return root;
         }
-        public static void helper(Queue<Node> silbs){
 
-         if(silbs.isEmpty())return;
-         Node prenode = null,node = null;
-         Queue<Node> temqueues = new LinkedList<>();
-         if(!silbs.isEmpty())
-             prenode = silbs.poll();
-         addElement(temqueues,prenode);
-         while (!silbs.isEmpty()){
-            node = silbs.poll();
-            if(node==null)
-                continue;
-            addElement(temqueues,node);
-            prenode.next = node;
-            prenode = node;
-         }
-         if(prenode!=null)
-            prenode.next = null;
-         helper(temqueues);
+        public static void exchangeL_R(TreeNode root){
+            TreeNode left = root.left;
+            root.left = root.right;
+            root.right = left;
         }
 
-        public static void addElement(Queue<Node> queue,Node node){
-            if(node.left==null)
-                return ;
-            queue.add(node.left);
-            queue.add(node.right);
-        }// 1ms
+    }
 
-        public static void helperII(Node root){
-            if(root==null || root.left==null)
-                return;
-            //保证这个节点肯定有两个子节点
-            root.left.next = root.right;//因为是完美二叉树   每个父节点都有两个子节点
-            if(root.next!=null)
-                root.right.next = root.next.left;
-            helperII(root.left);
-            helperII(root.right);
-        }//新思路   0ms
-    }//116
-
-    public static class FlattenBinaryTreeToLinked{
+    public static class CountTreeNode{
 
 //          Definition for a binary tree node.
-          public static class TreeNode {
+        static int nodeCount = 0;
+        public static class TreeNode {
+              int val;
+              TreeNode left;
+              TreeNode right;
+              TreeNode(int x) { val = x; }
+        }
+        public static int countNodes(TreeNode root) {
+            if(root==null)
+                return 0;
+            int deep = getDeep(root);//最深层
+            nodeCount = getNodeCount(deep-1);
+            getExtraNode(deep,root,1);
+
+            return nodeCount;
+        }
+
+        public static int getDeep(TreeNode root){
+            int deep = 0;
+            TreeNode p = root;
+            while (p!=null){
+                deep++;
+                p = p.left;
+            }
+            return deep;
+        }
+
+        public static int getNodeCount(int deep){
+            int n = 2;
+            while (deep>1){
+                n *= 2;
+                deep--;
+            }
+            return n-1;
+        }
+
+        public static void getExtraNode(int deep,TreeNode root,int curdeep){
+            if(root==null)
+                return;
+            if(curdeep==deep-1){
+                if(root.left!=null)nodeCount++;
+                if(root.right!=null)nodeCount++;
+                else
+                    return;
+            }else{
+                getExtraNode(deep,root.left,curdeep+1);
+                getExtraNode(deep,root.right,curdeep+1);
+            }
+        }
+    }//0ms 100%
+
+    public static class Calculator{
+        public static int calculate(String s) {
+            s = s.trim();
+            char[] cs = s.toCharArray();
+            Queue<Integer> queue = new LinkedList<>();
+            int val = -1;
+            for(char c:cs){
+                if(c==' ')
+                    continue;
+                else if(c=='+'||c=='-'||c=='('||c==')'){
+                    if(val!=-1)
+                        queue.add(val);
+                    queue.add(c-'0');
+                    val = -1;
+                }else if(val==-1){
+                    val = c-'0';
+                }else{
+                    val = val*10 + (c-'0');
+                }
+            }
+            if(val!=-1)
+                queue.add(val);
+            //上面将前缀表达式   存储到 Int型的队列中，  解决多位数  运算
+            Stack<Integer> stack = new Stack<>();
+            calOrder(queue,stack);
+            return stack.pop();
+//            queue = trans(queue);//将中缀转后缀
+//            return calRes(queue);
+        }
+        public static void inorderTransAfter(char[] cs,Stack<Character> stack,Queue<Character> queue){
+            for(char c:cs){
+                if(c=='+'||c=='-')
+                    if(stack.isEmpty()||stack.peek()=='(')
+                        stack.push(c);
+                    else {
+                        while (!stack.isEmpty()&&stack.peek()!='(')
+                            queue.add(stack.pop());
+                        stack.push(c);
+                    }
+                else if(c=='(')
+                    stack.push(c);
+                else if(c==' ')
+                    continue;
+                else if(c==')'){
+                    while (stack.peek()!='(')
+                        queue.add(stack.pop());
+                    stack.pop();
+                }
+                else{
+                    queue.add(c);
+                }
+            }
+            while (!stack.isEmpty())
+                queue.add(stack.pop());
+        }
+        public static int calAfterval(Queue<Character> queue){
+            Stack<Integer> nums = new Stack<>();
+            while (!queue.isEmpty()){
+                Character c = queue.poll();
+                if(c=='+'){
+                    int val1 = nums.pop();
+                    int val2 = nums.pop();
+                    nums.push(val1+val2);
+                }else if(c=='-'){
+                    int val1 = nums.pop();
+                    int val2 = nums.pop();
+                    nums.push(val2-val1);
+                }else
+                    nums.push(c-'0');
+            }
+            return nums.pop();
+        }//一位数计算  ，多位数就会出错
+
+        public static Queue<Integer> trans(Queue<Integer> queue){
+            Queue<Integer> str = new LinkedList<>();
+            Stack<Integer> opts = new Stack<>();
+            int c = -1;
+            while (!queue.isEmpty()){
+                c = queue.poll();
+                if(c==-8)//  (
+                    opts.push(c);
+                else if(c==-7){// )
+                    while (opts.peek()!=-8)
+                        str.add(opts.pop());
+                    opts.pop();
+                }else if(c==-5||c==-3){// +  -
+                    if(opts.isEmpty()||opts.peek()==-8)// (
+                        opts.push(c);
+                    else{
+                        while (!opts.isEmpty()&&opts.peek()!=-8)
+                            str.add(opts.pop());
+                        opts.push(c);
+                    }
+                }else
+                    str.add(c);
+            }
+            while (!opts.isEmpty())
+                str.add(opts.pop());
+            return str;
+        }//中缀转后缀
+        public static int calRes(Queue<Integer> queue){
+            Stack<Integer> stack = new Stack<>();
+            int val1 = 0;
+            int val2 = 0;
+
+            while (!queue.isEmpty()){
+                int c = queue.poll();
+                if(c == -5){
+                    val1 = stack.pop();
+                    val2 = stack.pop();
+                    stack.push(val1+val2);
+                }else if(c==-3){
+                    val1 = stack.pop();
+                    val2 = stack.pop();
+                    stack.push(val2-val1);
+                }else
+                    stack.push(c);
+            }
+            return stack.pop();
+        }//55ms
+
+        public static void calOrder(Queue<Integer> queue,Stack<Integer> stack){
+
+            int c = 0;
+            int val2 = 0;
+            int val1 = 0;
+            while (!queue.isEmpty()){
+                c = queue.poll();
+                if(c==-7)// )
+                    return;
+                else if(c==-8)// (
+                    calOrder(queue,stack);
+                else if(c==-5){// +
+                    val2 = queue.poll();
+                    if(val2==-8){
+                        calOrder(queue,stack);
+                        val2 = stack.pop();
+                    }
+                    val1 = stack.pop();
+                    stack.push(val1+val2);
+                }else if(c==-3){
+                    val2 = queue.poll();
+                    if(val2==-8){
+                        calOrder(queue,stack);
+                        val2 = stack.pop();
+                    }
+                    val1 = stack.pop();
+                    stack.push(val1-val2);
+                }else
+                    stack.push(c);
+            }
+        }//直接计算中缀表达式的值
+    }
+
+    public static class FindKthLargestNum{
+        static int flag = 0;
+        public static int findKthLargest(int[] nums, int k) {
+            quickSort(nums,0,nums.length-1,k);
+            return nums[nums.length-k];
+        }
+        public static void quickSort(int[] nums,int left,int right,int k){
+
+            if(left>=right)
+                return;
+            int pivo = partion(nums,left,right);
+            if(pivo+k==nums.length)
+                flag = 1;
+            if(flag==0)
+                quickSort(nums,left,pivo-1,k);
+            if(flag==0)
+                quickSort(nums,pivo+1,right,k);
+
+        }
+        public static int partion(int[] nums,int low,int hig){
+            int tem = nums[low];
+            while (low<hig){
+                while (low<hig && nums[hig]>=tem) --hig;
+                nums[low] = nums[hig];
+                while (low<hig && nums[low]<=tem)++low;
+                nums[hig] = nums[low];
+            }
+            nums[low] = tem;
+            return low;
+        }
+    }// 2ms  90%
+
+    public static class PreTree{
+        class Trie {
+            public TrieNode root;
+            class TrieNode{
+                TrieNode[] children = new TrieNode[26];
+                boolean isLast = false;
+//                int data = 0;
+            }
+
+            /** Initialize your data structure here. */
+            public Trie() {
+                root = new TrieNode();
+            }
+
+            /** Inserts a word into the trie. */
+            public void insert(String word) {
+                char[] cs = word.toCharArray();
+                TrieNode p = root;
+                for(char c:cs){
+                    TrieNode child =  p.children[c-'a'];
+
+                    if(child==null) {
+                        child = new TrieNode();
+//                        child.data = c - 'a';
+                        p.children[c - 'a'] = child;
+                    }
+                    p = child;
+                }
+                p.isLast = true;
+            }
+
+            /** Returns if the word is in the trie. */
+            public boolean search(String word) {
+                char[] cs = word.toCharArray();
+                TrieNode p = root;
+                TrieNode child = null;
+                for(char c:cs){
+                    child = p.children[c-'a'];
+                    if(child==null)
+                        return false;
+                    p = child;
+                }
+                return p.isLast;
+            }
+
+            /** Returns if there is any word in the trie that starts with the given prefix. */
+            public boolean startsWith(String prefix) {
+                char[] cs = prefix.toCharArray();
+                TrieNode p = root;
+                TrieNode child = null;
+                for(char c:cs){
+                    child = p.children[c-'a'];
+                    if(child==null)
+                        return false;
+                    p = child;
+                }
+                return true;
+            }
+        }
+    }//字典树   前缀树
+
+    public static class BinaryTreeRightView{
+
+
+//          Definition for a binary tree node.
+        public static class TreeNode {
+              int val;
+              TreeNode left;
+              TreeNode right;
+              TreeNode(int x) { val = x; }
+        }
+
+
+        public static List<Integer> res = new ArrayList<>();
+
+        public static List<Integer> rightSideView(TreeNode root) {
+            Queue<TreeNode> queue = new LinkedList<>();
+            Queue<TreeNode> prequeue = new LinkedList<>();
+            TreeNode p = null;
+            if(root==null)
+                return res;
+            prequeue.add(root);
+            queue.addAll(prequeue);
+
+            while (!queue.isEmpty()){
+                res.add(prequeue.peek().val);
+                queue.clear();
+                while (!prequeue.isEmpty()){
+                    p = prequeue.poll();
+                    if(p.right!=null)
+                        queue.add(p.right);
+                    if(p.left!=null)
+                        queue.add(p.left);
+                }
+                prequeue.addAll(queue);
+            }
+            return res;
+        }//2ms
+    }//未完待续
+
+    public static class CycleList{
+
+//          Definition for singly-linked list.
+        public static class ListNode {
+              int val;
+              ListNode next;
+              ListNode(int x) {
+                  val = x;
+                  next = null;
+              }
+        }
+
+        public static ListNode detectCycle(ListNode head) {
+
+            if(head==null || head.next==null)
+                return null;
+            HashMap<ListNode,Integer> hashMap = new HashMap<>();
+            int i = 0;
+            while (head!=null){
+                if (hashMap.containsKey(head))
+                    return head;
+                hashMap.put(head,i++);
+                head = head.next;
+            }
+            return null;
+        }//5ms 22.57%
+
+        /**当有圈的时候
+         * 当慢指针  与快指针相遇的时候   假设 慢指针走了  L1 的长度     此时   快指针走了  2*L1 的长度
+         * 快指针   比 慢指针 多走了  n圈  即   2*L1 - L1 = L1 = n * L ( L:圈的长度     L1:从头节点到相遇节点的距离 )
+         * 从相遇节点  开始  再继续走  L1的距离，依然会回到相遇节点       并且从  头节点开始走  L1的距离，也会到相遇节点
+         * 假设第一个 入圈 节点  到相遇节点的距离  是 B（这个我们不知道具体是多少）
+         * 从头节点走 L1-B 的距离  就正好是入圈的第一个节点       从相遇节点  走 L1-B 的距离 也正好是入圈的第一个节点
+         * 但是 B 我们无法得知，但是如果从头节点 与 相遇节点 同时开始走，第一个相遇的节点肯定是入圈的节点，因为  头节点到相遇节点的距离和相遇节点出发回到相遇节点的距离是一样的，所以肯定会相遇
+         * 距离，就类似于 一个   人  字
+         * 从 人 字 的两边出发，到上面的距离如果一样远，那么同步出发，那么肯定会在交点相遇
+         * @param head
+         * @return
+         */
+        public static ListNode detectCycleII(ListNode head){
+            if(head==null || head.next==null)
+                return null;
+            ListNode slow = hasCycle(head);
+            if(slow!=null){
+                ListNode q = head;
+                while (q!=slow){
+                    q = q.next;
+                    slow = slow.next;
+                }
+                return slow;
+            }
+            return null;
+        }//0ms 100%
+        public static ListNode hasCycle(ListNode head){
+            ListNode fast = head;
+            ListNode slow = head;
+            while (fast!=null&&fast.next!=null){
+                fast = fast.next.next;
+                slow = slow.next;
+                if(slow==fast)
+                    return slow;
+            }
+            return null;
+        }
+
+    }//0ms
+
+    public static class OrderTree{
+
+//          Definition for a binary tree node.
+        public static class TreeNode {
               int val;
               TreeNode left;
               TreeNode right;
@@ -258,960 +1024,591 @@ public class Main {
                   this.left = left;
                   this.right = right;
               }
-         }
+        }
 
-        public static void flatten(TreeNode root) {
+        public static List<Integer> res = new ArrayList<>();
+
+        public static List<Integer> preorderTraversal(TreeNode root) {
             helper(root);
+            return res;
         }
-        public static TreeNode helper(TreeNode root){
-              if(root.right==null&&root.left==null)
-                  return root;
-
-
-              TreeNode q = root.right;
-
-              if(root.left!=null){
-                  root.right = root.left;
-//                  TreeNode temres = helper(root.left);
-                  TreeNode temres = helper(helper(root.left));
-//                  temres = helper(temres);
-
-                  temres.right = q;
-                  root.left = null;
-              }
-              q = root.right;
-              return helper(q);
-        }
-    }//0ms 100%
-
-    public static class PathSumII{
-
-//          Definition for a binary tree node.
-        public static class TreeNode {
-              int val;
-              TreeNode left;
-              TreeNode right;
-              TreeNode(int x) { val = x; }
-        }
-
-        public static List<List<Integer>> res = new ArrayList<>();
-        public static List<Integer> seqr = new ArrayList<>();
-
-        public static List<List<Integer>> pathSum(TreeNode root, int sum) {
-                if(root==null)
-                    return res;
-                seqr.add(root.val);
-                helper(root,sum-root.val);
-                return res;
-        }
-        public static void helper(TreeNode root, int sum){
-            if(sum==0&&root.left==null && root.right==null)
-                res.add(new ArrayList<>(seqr));
-            if(root.left != null){
-                seqr.add(root.left.val);
-                helper(root.left,sum-root.left.val);
-                seqr.remove(seqr.size()-1);
-            }
-            if(root.right != null){
-                seqr.add(root.right.val);
-                helper(root.right,sum-root.right.val);
-                seqr.remove(seqr.size()-1);
-            }
-        }
-    }//1ms  100%
-
-    public static class BuildTreeByPre_Inorder{
-
-//          Definition for a binary tree node.
-          public static class TreeNode {
-              int val;
-              TreeNode left;
-              TreeNode right;
-              TreeNode(int x) { val = x; }
-          }
-
-        public static TreeNode buildTree(int[] preorder, int[] inorder) {
-
-            TreeNode root = null;
-
-            int len = preorder.length;
-
-            ArrayList<Integer> pre = new ArrayList<>();
-            ArrayList<Integer> inor = new ArrayList<>();
-
-            if(len==0)
-                return root;
-
-//            for(int i = 0;i < len;i++){
-//                pre.add(preorder[i]);
-//                inor.add(inorder[i]);
-//            }
-//            return helper(pre,inor,root);
-//            return helper(preorder,inorder,0,len-1,0,len-1,root);
-            return root;
-        }
-        public static TreeNode helperI(List<Integer> pre,List<Integer> inor,TreeNode root){
-
-            int len = pre.size();
-            List<Integer> leftrees = null;
-            List<Integer> righttrees = null;
-
-            int val = pre.get(0);
-            root = new TreeNode(val);
-            int valindex = inor.indexOf(val);
-
-            leftrees = inor.subList(0, valindex);
-            righttrees = inor.subList(valindex + 1, inor.size());
-
-
-            if (leftrees.size() == 1)
-                root.left = new TreeNode(leftrees.get(0));
-            else if (leftrees.size() > 1)
-                root.left = helperI(pre.subList(1, len - righttrees.size()), leftrees, root.left);
-
-            if (righttrees.size() == 1)
-                root.right = new TreeNode(righttrees.get(0));
-            else if (righttrees.size() > 1)
-                root.right = helperI(pre.subList(leftrees.size() + 1, len), righttrees, root.right);
-            return root;
-        }//26ms  利用  List 实现类
-
-        public static TreeNode helperII(int[] pre,int[] inor,int preL,int preR,int inorL,int inorR,TreeNode root){
-              int len = preR - preL;
-              int val = pre[preL];
-              root = new TreeNode(val);
-              int valindex = inorL;
-              while (valindex<=inorR){
-                  if(inor[valindex]==val)
-                      break;
-                  valindex++;
-              }
-              if(valindex-inorL == 1)
-                  root.left = new TreeNode(inor[inorL]);
-              else if(valindex-inorL > 1)
-                  root.left = helperII(pre,inor,preL+1 , preR , inorL ,valindex-1,root.left);
-
-
-              if(inorR - valindex == 1)
-                  root.right = new TreeNode(inor[inorR]);
-              else if(inorR - valindex > 1)
-                  root.right = helperII(pre,inor,preL+1+(valindex-inorL),preR,valindex+1,inorR,root.right);
-//            +(valindex-inorL)
-
-              return root;
-        }//4ms  直接计算 index
-
-//        public static TreeNode helperIII()
-    }
-
-    public static class BinaryTreeLevelZigzag{
-
-        public static class TreeNode {
-            int val;
-            TreeNode left;
-            TreeNode right;
-            TreeNode(int x) { val = x; }
-        }
-
-        static List<List<Integer>> res = new ArrayList<>();
-        static List<Integer> temres = new ArrayList<>();
-
-        static Stack<TreeNode> prenode = new Stack<>();
-        static Stack<TreeNode> node = new Stack<>();
-        static boolean LR = false;
-        public static List<List<Integer>> zigzagLevelOrder(TreeNode root) {
-
+        public static void helper(TreeNode root){
             if(root==null)
-                return res;
-            prenode.push(root);
-            helper(0);
+                return;
+            res.add(root.val);
+            helper(root.left);
+            helper(root.right);
+        }
 
+        public static List<Integer> postorderTraversal(TreeNode root) {
+            helperII(root);
             return res;
         }
-
-        /**
-         * 采用LR记录方向  2ms   13.1%
-         */
-        public static void helper(){
-            if(prenode.size()==0)
+        public static void helperII(TreeNode root){
+            if(root==null)
                 return;
-
-            for(TreeNode node:prenode)
-                temres.add(node.val);
-
-            res.add(new ArrayList<>(temres));
-            temres.clear();
-
-            int size = prenode.size();
-            for(int i = 0;i<size;i++)
-                addnode(prenode.pop(),LR);
-            LR = !LR;
-            prenode.addAll(node);
-            node.clear();
-            helper();
+            helperII(root.left);
+            helperII(root.right);
+            res.add(root.val);
         }
-        public static void addnode(TreeNode node1,boolean LR){
-            if(LR){
-                if(node1.left!=null)
-                    node.push(node1.left);
-                if(node1.right!=null)
-                    node.push(node1.right);
-            }else{
-                if(node1.right!=null)
-                    node.push(node1.right);
-                if(node1.left!=null)
-                    node.push(node1.left);
-            }
-        }
-
-        public static void helper(int level){
-            if(prenode.size()==0)
-                return;
-            for(TreeNode node1:prenode)
-                temres.add(node1.val);
-            res.add(new ArrayList<>(temres));
-            temres.clear();
-
-            /**
-             * 偶数层  从左到右
-             */
-            TreeNode root = null;
-            int len = prenode.size();
-            if((level&1) ==1) {  //true 偶数
-                for(int i = 0;i<len;i++){
-                     root = prenode.pop();
-                     if(root.left!=null)
-                        node.push(root.left);
-
-                    if(root.right!=null)
-                        node.push(root.right);
-                }
-            }else{
-                for(int i = 0;i<len;i++){
-                    root = prenode.pop();
-                    if(root.right!=null)
-                        node.push(root.right);
-                    if(root.left!=null)
-                        node.push(root.left);
-                }
-            }
-            prenode.addAll(node);
-            node.clear();
-            helper(level+1);
-        }// 2ms
     }
 
-
-    public static class WiggleSubsqquence{
-
-        public static int wiggleMaxLengthII(int[] nums) {
-
-            int n = nums.length;
-            if (n < 2) {
-                return n;
-            }
-            int up = 1;
-            int down = 1;
-            for (int i = 1; i < n; i++) {
-                if (nums[i] > nums[i - 1]) {
-                    up = down + 1;
-                }
-                if (nums[i] < nums[i - 1]) {
-                    down = up + 1;
-                }
-            }
-            return Math.max(up, down);
-        }//it
-
-        public static int wiggleMaxLength(int[] nums){
-            int len = nums.length;
-
-            if(len < 2)
-                return len;
-
-            int[] updp = new int[len];
-            int[] downdp = new int[len];
-
-            downdp[0] = 1;
-            updp[0] = 1;
-
-            for(int i = 1 ; i < len ; i++){
-                if ( nums[i] < nums[i-1] ) {
-                    downdp[i] = Math.max( downdp[i-1] , updp[i-1]+1 );
-                } else  if ( nums[i] > nums[i-1] ) {
-                    updp[i] = Math.max( updp[i-1] , downdp[i-1]+1 );
-                }
-                else{
-                    updp[i] = updp[i-1];
-                    downdp[i] = downdp[i-1];
-                }
-            }
-            return Math.max(downdp[len-1],updp[len-1]);
-        }
-
-    }//动态规划    两个dp 问题   一个记录上升沿   一个记录下降沿
-
-    public static class CombinationSumIV{
-        static List<ArrayList> res = new ArrayList<>();
-        public static int combinationSum4(int[] nums, int target) {
-                if(nums.length==0)
-                    return 0;
-                boolean[] visited = new boolean[nums.length];
-                ArrayList<Integer> seqr = new ArrayList<>();
-                Arrays.sort(nums);
-
-//                helper(nums,seqr,visited,target);
-                return helper(nums,target);
-
-        }
-
-        public static void helperII(int[] nums,ArrayList<Integer> seqr,boolean[] visited,int target){
-            visited = new boolean[nums.length];
-            if(target<0)
-                return;
-
-            if(target==0){
-                System.out.println(seqr.toString());
-                res.add(new ArrayList(seqr));
-                return;
-            }
-
-
-            for(int i = 0;i<nums.length;i++){
-                    if(!visited[i]){
-                        visited[i] = true;
-                        seqr.add(nums[i]);
-                        helperII(nums,seqr,visited,target-nums[i]);
-                        seqr.remove(seqr.size()-1);
-                        visited[i] = false;
-                    }
-            }
-        }//  单纯递归   会有很多相同问题得求解  单纯递归会 超出时间
-
-        public static int helper(int[] nums,int target){
-            int[] dp = new int[target+1];
-
-            dp[0] = 1;     //  (1,3,4)    dp[7] =  (1 + dp[6] )    + ( 3 + dp[4] )   + ( 4 + dp[3] )  dp[0] = 1  表示  前面的数字正好等于  target
-//            dp[6]   =    1 + dp[5]       3 + dp[3]    4 + dp[2]
-//            dp[5]   =    1 + dp[4]       3 + dp[2]    4 + dp[1]
-//            dp[4]   =    1 + dp[3]        -------------------
-//            dp[3]   =
-//            dp[2]   =
-//            dp[1]   =     1 + dp[0]
-//            dp[0] = 0
-
-            for(int i = 1; i<=target;i++){
-                for(int num:nums)
-                    if(num<=i)
-                        dp[i] = dp[i] + dp[i-num];
-            }
-            return dp[target];
-        }// 想法  很巧妙     自底向上
-
-    }//377  动态问题
-
-    public static class CanIWin{
-
-        static int[] dp = new int[ 300 + 1 ];//  1 winner     0  failer      -1 initial
-
-        public static boolean canIWin(int maxChoosableInteger, int desiredTotal) {
-
-                    for(int i = 0;i < dp.length;i++)
-                        dp[i] = -1;
-
-                    for(int i = 0;i < Math.min(maxChoosableInteger+1,desiredTotal+1);i++)
-                        dp[i] = 1;
-
-                    boolean[] visited = new boolean[ maxChoosableInteger + 1 ];
-
-                    int[] nums = new int[ maxChoosableInteger + 1 ];
-
-                    for(int i = 0;i < maxChoosableInteger+1;i++)
-                        nums[i] = i;
-
-
-                    return helper(nums,visited,desiredTotal,dp);
-        }
-
-        public static boolean helper(int[] nums,boolean[] visited,int res,int[] dp ){
-            if(res<=0)
-                return true;
-            if(dp[res]!=-1)
-                return dp[res]==1 ? true : false;
-
-            for(int i = nums.length-1 ; i > 0;i--){
-
-                if(!visited[i]){
-
-                    visited[i] = true;
-
-
-
-//                    boolean result =  helper(nums,visited,res-i,dp);
-//
-//                    if(result){
-//                        dp[res] = 0;
-//                        return false;
-//                    }
-
-                    visited[i] = false;
-                }
-            }
-            dp[res] = 0;
-            return false;
-        }
-
-    }//464  待完成
-
-    public static class IsSubsequence{
-
-        public static boolean isSubsequence(String s, String t) {
-          char[] childs = s.toCharArray();
-
-          char[] cs = t.toCharArray();
-
-          if(childs.length==0)
-              return true;
-          if(cs.length==0&&childs.length!=0)
-              return false;
-
-          int index = 0;
-          int i = 0;
-
-          for(;index < cs.length;){
-              if(childs[i]==cs[index++]){
-                  i++;
-                  if(i==childs.length)
-                      return true;
-              }
-          }
-          return false;
-        }// 1ms 击败78%
-    }//392
-
-    public static class IsNumber{
-        public static boolean isNumber(String s) {
-                char[] cs = s.toCharArray();
-                int index = 0;
-                boolean have_e = false;
-                boolean e_sign = false;
-                boolean have_point = false;
-                boolean e_num = false;
-                int end = cs.length-1;
-
-                while ( index<cs.length && cs[index]==' ')
-                    index++;
-                while (end>0&& cs[end]==' ')
-                    end--;
-                end++;
-
-                if(index == cs.length)
-                    return false;
-                if(cs[index]=='-'||cs[index]=='+')
-                    index++;
-
-                if((!s.contains("1")&&!s.contains("2")&&!s.contains("3")&&!s.contains("4")&&!s.contains("5")&&!s.contains("6")&&!s.contains("7")&&!s.contains("8")&&!s.contains("9")&&!s.contains("0")))
-                    return false;
-//|| ( (Math.abs(copy.indexOf(".")-copy.indexOf("e"))==1)&&copy.indexOf(".")!=-1&&copy.indexOf("e")!=-1 )
-//            &&copy.length()==1
-                String copy = s.trim();
-                if(copy.lastIndexOf("e")==copy.length()-1||(copy.indexOf(".")==0)||copy.indexOf("e")==0 )//不能以小数点和e结尾
-                    return false;
-//            System.out.println(s.indexOf(".")-s.indexOf("e"));
-//                cs = s.toCharArray();
-//                index = 0;
-                while ( index < end ){
-//                    System.out.println(index!=cs.length-1);
-                    if( !have_e && cs[index]=='e'){
-                        have_e = true;
-                    }else if(have_e && cs[index]=='e')
-                        return false;
-                    else if(have_e && cs[index]=='.')
-                        return false;
-                    else if(have_e && !e_sign &&cs[index]=='-')
-                        e_sign = true;
-                    else if(have_e && e_sign &&cs[index]=='-')
-                        return false;
-                    else if(have_e && e_sign &&cs[index]=='+')
-                        return false;
-                    else if(have_e && e_sign &&cs[index]=='.')
-                        return false;
-//                    else if(have_point && cs[index]==' ')
-//                        return false;
-                    else if(cs[index]==' ')
-                        return false;
-                    else if(!have_point&&cs[index]=='.')
-                        have_point = true;
-                    else if(have_point&&cs[index]=='.')
-                        return false;
-                    else if(cs[index]>'9'||cs[index]<'0')
-                            return false;
-                    else if(have_e && cs[index]<='9'&&cs[index]>='0')
-                        e_num = true;
-
-                    index++;
-                }
-                if(have_e&&!e_num)
-                    return false;
-                return true;
-        }
-    }//待续
-
-    public static class SortColor{
-        public static void sortColorsII(int[] nums) {
-            Arrays.sort(nums);
-            for(int n:nums)
-                System.out.print(n+" ");
-        }
-
-        public static void sortColorsIII(int[] nums) {//  0 - red     1 - white   2 - blue
-            int red = 0,white = 0,blue = 0,tem = 0,index = 0;
-            int len = nums.length;
-            if(len<2)
-                return;
-            while ( index < len ){
-                if(nums[index]==0)
-                    red++;
-                else if(nums[index]==1)
-                    white++;
-                else
-                    blue++;
-                index++;
-            }
-            index=0;
-            if(red!=0)
-            while (index<red)
-                nums[index++] = 0;
-
-            if(white!=0)
-            while (index<red+white)
-                nums[index++] = 1;
-
-            if(blue!=0)
-            while (index<len)
-                nums[index++] = 2;
-            return;
-        }//扫描了两遍  空间是常数空间     还可以优化为扫描一遍   空间是常数空间
-
-
-        public static void sortColorsIV(int[] nums) {//  0 - red     1 - white   2 - blue
-                int p0 = 0,p1 = 0, p2 = 0;
-                int index = 0;
-                while (index < nums.length){
-                    if(nums[index] == 0){
-                        swap(nums,p0,index);
-                        if(p0<p1)
-                            swap(nums,index,p1);
-                        p0++;
-                        p1++;
-                    }else if(nums[index]==1){
-                        swap(nums,index,p1);
-                        p1++;
-                    }
-                    index++;
-                }
-                return ;
-        }
-
-        public static void sortColors(int[] nums) {
-            int red = 0,len = nums.length,blue = len - 1;
-            int index = 0;
-            while (index<=blue){
-                if(nums[index]==2){
-                    swap(nums,index,blue--);
-                    continue;
-                }
-
-                if(nums[index]==0){
-                    swap(nums,index++,red++);
-                    continue;
-                }
-                index++;
-            }
-            return ;
-        }//败给了双指针？？？无法理解
-
-        public static void swap(int[] nums,int j,int k){
-            int temp = nums[j];
-            nums[j] = nums[k];
-            nums[k] = temp;
-        }
-
-    }//0ms 100%
-
-    public static class SubSet{
-        static List<Integer> sqer = new ArrayList<>();
-        static List<List<Integer>> res = new ArrayList<>();
-        public static List<List<Integer>> subsets(int[] nums) {
-
-            int targetsize = 0;
-
-            for(int i = 0;i <= nums.length;i++)
-                helper(nums,0,i);
-
-            return res;
-        }
-        public static void helper(int[] nums,int index,int tagetsize){
-            if(sqer.size()==tagetsize){
-                res.add(new ArrayList<>(sqer));
-                return;
-            }
-            for(int i = index;i < nums.length;i++){
-                sqer.add(nums[i]);
-                helper(nums,i+1,tagetsize);
-                sqer.remove(sqer.size()-1);
-            }
-        }
-    }//1ms   95%
-
-    public static class Combinations{
-
-
-
-        public static List<List<Integer>> combine(int n, int k) {
-
-            List<List<Integer>> res = new ArrayList<>();
-            List<Integer> seqr = new ArrayList<>();
-
-            int[] nums = new int[n];
-            for(int i = 0 ; i < n ; i++)
-                nums[i] = i+1;
-
-            helper(nums,k,0,res,seqr);
-
-            return res;
-        }
-
-        public static void helper(int[] nums,int targetsize,int index,List<List<Integer>> res,List<Integer> seqr){
-
-            if(seqr.size()==targetsize){
-                res.add(new ArrayList<>(seqr));
-                return;
-            }
-
-            for(int i = index ;i <= nums.length - (targetsize-seqr.size());i++){//  最多只能从 n-targetsize开始取  并且 还能取得 targetsize - seqr.size()这么多位
-
-                seqr.add(nums[i]);
-
-                helper(nums,targetsize,i+1,res,seqr);
-
-                seqr.remove(seqr.size()-1);
-            }
-        }//23ms   41%
-
-    }
-
-    public static class RemoveDup{
-        public static int removeDuplicates(int[] nums) {
-                int p = 0,q = 0,res = 0;
-
-                int count = 0;
-
-                while (q<nums.length){
-
-                    if(nums[p]==nums[q])
-                        count++;
-
-                    else{
-                        res = getRes(nums, p, res, count);
-                        p = q;
-                        count = 1;
-
-                    }
-                    q++;
-                }
-            res = getRes(nums, p, res, count);
-
-            return res;
-        }
-
-        private static int getRes(int[] nums, int p, int res, int count) {
-            if (count >= 2) {
-                nums[res] = nums[p];
-                nums[res + 1] = nums[p];
-                res += 2;
-            } else
-                nums[res++] = nums[p];
-            return res;
-        }
-    }//1ms  84%
-
-    public static class PartitionList{
-
-          public static class ListNode {
-              int val;
-              ListNode next;
-              ListNode(int x) { val = x; }
-          }
-
-        public static ListNode partitionII(ListNode head, int x) {
-              ListNode p = head,pre = head,res = null;
-              ArrayList<ListNode> nodes = new ArrayList<>();
-
-              if (head!=null){
-
-                  if(pre.val >= x ){
-                      nodes.add(pre);
-                      pre = pre.next;
-                      while (pre!=null&& pre.val >= x)
-                          pre = pre.next;
-                  }
-              }else
-                  return head;
-              res = pre;
-              if(pre==null)
-                  return head;
-                p = pre.next;
-
-
-              while (p!=null){
-
-                if(p.val < x ){
-                    pre.next = p;
-                    pre = p;
-                }else {
-                    nodes.add(p);
-                    p = p.next;
-                    while (p!=null && p.val >=x )
-                        p = p.next;
-                    continue;
-                }
-                p = p.next;
-              }
-
-              for(int i = 0;i < nodes.size();i++){
-                  p = nodes.get(i);
-
-                  pre.next = p ;
-                  while (p!=null && p.val >= x){
-                      pre = p;
-                      p = p.next;
-                  }
-              }
-              pre.next = null;
-              return res;
-        }//1ms    18%
-
-        /**
-         * 思路二
-         *  双指针
-         *      通过  pre 系列指针记录比x小的所有val节点
-         *           after系列指针记录不小于x的所有val节点
-         *           最后将pre的尾巴的next指针指向  pre的头部
-         *      然后返回 头部指针
-         * @param head
-         * @param x
-         * @return
-         */
-        public static ListNode partition(ListNode head, int x){
-              if(head==null)
-                  return head;
-
-              ListNode pre_head = head,pre_tail = null;
-              ListNode after_head = head,after_tail = null;
-
-              while (after_head!=null && after_head.val < x)
-                  after_head = after_head.next;
-
-              while(pre_head!=null && pre_head.val >= x)
-                  pre_head = pre_head.next;
-
-              //after_head.val 大于等于 x      null
-            if(after_head==null||pre_head==null)
-                return head;
-
-            after_tail = after_head;
-            pre_tail = pre_head;
-
-            ListNode p = head;
-            while (p!=null){
-                if( p == after_head || p == after_tail || p == pre_head || p == pre_tail){
-                     p = p.next;
-                     continue;
-                }
-                if(p.val < x){
-                    pre_tail.next = p;
-                    pre_tail = p;
-                }else{
-                    after_tail.next = p;
-                    after_tail = p;
-                }
-                p = p.next;
-            }
-            pre_tail.next = after_head;
-            after_tail.next = null;
-            return pre_head;
-        }//0ms   100%
-
-    }
-
-    public static class GrayCode{
-        //格雷编码     i^(i>>1)    i  异或  i右移 一位
-
-        /**
-         * 小知识：
-         *      格雷编码：在一组数的二进制编码中，任意两个相邻的编码，有且仅有一位二进制数不同，这种编码称为二进制编码
-         *
-         *      一个数  与  自己右移 一位     做异或运算       就可得到相邻的格雷码
-         *
-         * @param n
-         * @return
-         */
-
-        public static List<Integer> grayCode(int n) {
-            List<Integer> res = new ArrayList<>();
-
-            for(int i = 0 ; i < 1<<n ; i++){
-                res.add(i ^ (i>>1));
-            }
-            return res;
-        }
-
-//        public static void helper(char[] cs,int zeroindex){
-//                flag = false;
-//                res.add(Integer.parseInt(new String(cs),2));
-//                for(int i = zeroindex;i >= 0;i--){
-//                    cs[i] =  flag ==false? '1' : '0';
-//                    helper(cs,i-1);
-//                    cs[i] = cs[i]=='1' ? '0' : '1';
-//                }
-//                flag = true;
-//        }
-    }//格雷编码   自己  与  自己右移一位  做异或
-
-    public static class ReverseLink{
+    public static class SortLinkedList{
 
 //          Definition for singly-linked list.
-          public static class ListNode {
+        public static class ListNode {
               int val;
               ListNode next;
-              ListNode(int x) { val = x; }
-          }
+              ListNode() {}
+              ListNode(int val) { this.val = val; }
+              ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+        }
 
-        public static ListNode reverseBetween(ListNode head, int m, int n) {
+        public static ListNode sortList(ListNode head) {
             if(head==null)
+                return null;
+            ListNode q = new ListNode(-1);
+            q.next = head;
+            ListNode pre = q;
+            ListNode w = pre.next;
+
+            ListNode p = head.next;
+            w.next = null;
+            while (p!=null){
+                pre = q;
+                w = pre.next;
+                while (w.next!=null){
+                    if(w.val<p.val){
+                        pre = w;
+                        w = w.next;
+                    }else{
+                        ListNode node = p.next;
+                        p.next = w;
+                        pre.next = p;
+                        p = node;
+                        break;
+                    }
+                }
+                if(w.next==null)
+                    if(w.val<p.val){
+                    w.next = p;
+                    w = p;
+                    p = p.next;
+                    w.next = null;
+                    }else{
+                        ListNode node = p.next;
+                        p.next = w;
+                        pre.next = p;
+                        w.next = null;
+                        p = node;
+                    }
+            }
+            return q.next;
+        }//时间复杂度太高   直接插入排序  O(n^2)
+
+        public static ListNode sortListII(ListNode head){
+            if(head==null || head.next==null)
                 return head;
-            ListNode pre = head,t = head,p = null,tail = head;
+            ListNode fast = head;
+            ListNode slow = head;
+            while (fast.next!=null &&fast.next.next!=null){
+                fast = fast.next.next;
+                slow = slow.next;
+            }
 
-            for(int i = 1;i < m-1;i++)
-                pre = pre.next;
+            ListNode mid = slow.next;
+            slow.next = null;
+            ListNode left = sortListII(head);
+            //mid 递归
+            ListNode right = sortListII(mid);
+//            return mergeSort(left,right);
+            return  concat(left,right);
+        }//二路归并排序    快慢指针
 
-            if(m==1)
-                t = head;
-            else
-                t = pre.next;
-            if(t==null)
-                return head;
+        public static ListNode mergeSort(ListNode left,ListNode right){
+            if(left==null)
+                return right;
+            if(right==null)
+                return left;
+            if(left.val<right.val){
+                left.next = mergeSort(left.next,right);
+                return left;
+            }else{
+                right.next = mergeSort(left,right.next);
+                return right;
+            }
+        }//二合一
 
-            p = t.next;
+        public static ListNode merge(ListNode head,int tagsize){
+            int size = 1;
+            int i = 0;
+            ListNode p1 = head;
+            ListNode p2 = head.next;
+            ListNode root = null;
+            while (head!=null){
 
-            for(int i = 1;i <n ;i++)
-                tail = tail.next;
+                p1 = cutList(head,size);
+                while (i<size)
+                    head = head.next;
 
-            while (t!=tail){
-                t.next = tail.next;
-                tail.next = t;
-                t = p;
+                p2 = cutList(head,size);
+                while (i<size && head!=null)
+                    head = head.next;
+
+                p1 = concat(p1,p2);
+                size <<= 1;
+
+//                if(size<tagsize)
+
+            }
+            return root;
+        }
+        public static ListNode cutList(ListNode head,int size){
+            ListNode root = head;
+            ListNode p = head;
+            while (size>1){
+                p = p.next;
+                size--;
+            }
+            p.next  =null;
+            return root;
+        }//断链   切出来规定大小的节点
+        public static ListNode concat(ListNode root1,ListNode root2){
+            ListNode root = null;
+            //寻找二路归并的头节点
+            if(root1.val<root2.val){
+                root = root1;
+                root1 = root1.next;
+            }else{
+                root = root2;
+                root2 = root2.next;
+            }
+            //工作节点
+            ListNode p = root;
+            while (root1!=null && root2!=null){
+                if(root1.val<root2.val){
+                    p.next = root1;
+                    root1 = root1.next;
+                }else{
+                    p.next = root2;
+                    root2 = root2.next;
+                }
                 p = p.next;
             }
-            if(m!=1){
-                pre.next = t;
-                return head;
+            //连接上 最后剩下的有序链表
+            p.next = root1==null ? root2 : root1;
+            //返回头节点
+            return root;
+        }//二路合一
+    }//6ms 82.13%
+
+    public static class ReverPolishNotation{
+        public static int evalRPN(String[] tokens) {
+            if(tokens.length==0)
+                return 0;
+            Stack<Integer> nums = new Stack<>();
+            for(String s:tokens)
+                if(  "+".equals(s) ){
+                    int val1 = nums.pop();
+                    int val2 = nums.pop();
+                    nums.push(val1+val2);
+                }
+                else if(  "-".equals(s) ){
+                    int val1 = nums.pop();
+                    int val2 = nums.pop();
+                    nums.push(val1-val2);
+                }
+                else if(  "*".equals(s) ){
+                    int val1 = nums.pop();
+                    int val2 = nums.pop();
+                    nums.push(val1*val2);
+                }
+                else if(  "/".equals(s) ){
+                    int val1 = nums.pop();
+                    int val2 = nums.pop();
+                    nums.push(val2/val1);
+                }
+                else
+                    nums.push(Integer.parseInt(s));
+
+
+            return nums.pop();
+
+        }//7ms   59%
+
+        public static int evalRPNII(String[] tokens){
+            int[] nums = new int[tokens.length];
+            int size = 0;
+            for(String s:tokens)
+                if(  "+".equals(s) ){
+                    int val1 = nums[--size];
+                    int val2 = nums[--size];
+                    nums[size++] = val1+val2;
+                }
+                else if(  "-".equals(s) ){
+                    int val1 = nums[--size];
+                    int val2 = nums[--size];
+                    nums[size++] = val2-val1;
+                }
+                else if(  "*".equals(s) ){
+                    int val1 = nums[--size];
+                    int val2 = nums[--size];
+                    nums[size++] = val1*val2;
+                }
+                else if(  "/".equals(s) ){
+                    int val1 = nums[--size];
+                    int val2 = nums[--size];
+                    nums[size++] = val2/val1;
+                }
+                else
+                    nums[size++] = Integer.parseInt(s);
+                return nums[--size];
+        }//3ms  99.52%
+    }//3ms 99.56%
+
+    public static class WordsBreak{
+        public static boolean wordBreak(String s, List<String> wordDict) {
+            char[] cs = s.toCharArray();
+
+            return helper(cs,0,wordDict);
+        }
+        public static boolean helper(char[] cs,int startindex,List<String> wordDict){
+            if(startindex==cs.length)
+                return true;
+            for(int i = 0;i < wordDict.size();i++){
+                String  str = wordDict.get(i);
+                if(judge(cs,startindex,str))
+                    if(helper(cs,startindex+str.length(),wordDict))
+                        return true;
             }
-            return tail;
+            return false;
+        }
+        public static boolean judge(char[] cs,int startindex,String str){
+            char[] cw = str.toCharArray();
+            for(int i = 0;i < cw.length;i++){
+                if(startindex+i>= cs.length || cs[startindex+i]!=cw[i])
+                    return false;
+            }
+            return true;
+        }//遇到特殊例子会发生深度递归，会很慢
+
+        /**
+         * 字典树方法
+         */
+        public static boolean wordBreak(){
+            return true;
+        }
+
+    }
+
+
+    /**
+     * 解题思路：
+     *遍历二维矩阵的四条边 ， 发现  ‘O’ 以后，进行深度优先遍历，将所有遍历到的  'O' 变为   '-' ，然后再将二维矩阵中 所有的 'O'变为  'X'  因为此时的'O'就是被包围了
+     * 再将剩下的'-'变为'O'，
+     *
+     * 对未受到保护的字符的轰炸
+     *
+     */
+    public static class SurroundRegonII{
+        public static void solve(char[][] board) {
+
+            if(board.length==0 || board[0].length==0)
+                return;
+
+//            boolean[][] flag = new boolean[board.length][board[0].length];
+            int i = board.length-1;
+            int j = 0;
+
+            while (j < board[0].length){
+                if(board[0][j]=='O')
+                    dfs(board,0,j);
+                if(board[i][j]=='O')
+                    dfs(board,i,j);
+                j++;
+            }
+            i = 0;
+            j = board[0].length-1;
+            while (i<board.length){
+                if(board[i][0]=='O')
+                    dfs(board,i,0);
+                if(board[i][j]=='O')
+                    dfs(board,i,j);
+                i++;
+            }
+            i = 1;
+            while (i<board.length){
+                j = 1;
+                while (j<board[0].length){
+                    if(board[i][j]=='O')
+                        board[i][j] = 'X';
+                    else if(board[i][j]=='-')
+                        board[i][j] = 'O';
+                    j++;
+                }
+                i++;
+            }
+        }
+        public static void dfs(char[][] board,int i,int j){
+           if(i<0||j<0||i>board.length-1||j>board[0].length-1||board[i][j]=='X'||board[i][j]=='-')
+               return;
+            board[i][j] = '-';
+            dfs(board,i-1,j);
+            dfs(board,i+1,j);
+            dfs(board,i,j-1);
+            dfs(board,i,j+1);
+        }
+    }//2ms
+
+    public static class SurroundRegon{
+        static boolean[][] path;
+        public static void solve(char[][] board) {
+            if(board.length==0 || board[0].length==0)
+                return;
+            boolean[][] flag = new boolean[board.length][board[0].length];
+            int i = board.length-1;
+            int j = 0;
+            path = new boolean[flag.length][flag[0].length];
+//            int direction = 0;//方向位     1 上    2下    3 左   4 右
+
+            while (j < board[0].length){
+                if(board[0][j]=='O')
+                    flag[0][j] = true;
+                if(board[i][j]=='O')
+                    flag[i][j] = true;
+                j++;
+            }
+            i = 0;
+            j = board[0].length-1;
+            while (i<board.length){
+                if(board[i][0]=='O')
+                    flag[i][0] = true;
+                if(board[i][j]=='O')
+                    flag[i][j] = true;
+                i++;
+            }
+            i = 1;
+            while (i<board.length-1){
+                j = 1;
+                while (j<board[0].length-1){
+                    if(board[i][j]=='O' && !flag[i][j]){
+                        judge(board,flag,i,j,4);
+                        path[i][j] = false;
+                    }
+                    j++;
+                }
+                i++;
+            }
+        }
+        public static void judge(char[][] board,boolean[][] flag,int i,int j,int direction){
+
+            if(flag[i-1][j] || flag[i][j-1] || flag[i+1][j] || flag[i][j+1]){
+                flag[i][j] = true;
+                changeFtoT(board,i,j,flag);
+            }
+            else if(search(board, flag, i, j, direction)){
+                flag[i][j] = true;
+                changeFtoT(board,i,j,flag);
+            }
+            else{
+                board[i][j] = 'X';
+                changeOtoX(board,i,j);
+            }
 
         }
-    }//0ms  100%
+        public static boolean search(char[][] board,boolean[][] flag,int i,int j,int direction){
 
-    public static class NumTrees{
-        static Integer[] dp;
-        public static int numTrees(int n) {
-//            int[] dp = new int[n];
-//            boolean[] visited = new boolean[n];
-//            dp[0] = 1;
-//            if(n==0)
-//                return 1;
-//
-//            visited[0] = true;
-            dp = new Integer[n+1];
-            dp[0] = 1;
-            dp[1] = 1;
-//            System.out.println(dp[2]);
-            return f(n);
-        }
-        public static int f( int n){
+            if(path[i][j])
+                return false;
+            path[i][j] = true;
 
-            if(dp[n]!=null)
-                return dp[n];
-
-            int res = 0;
-            for(int i = 0;i<n;i++){
-                if(dp[i]==null)
-                    dp[i] = f(i);
-                if(dp[n-1-i]==null)
-                    dp[n-1-i] = f(n-1-i);
-                res = res + dp[i]*dp[n-1-i];
+            if( flag[i-1][j] || flag[i][j-1] || flag[i+1][j] || flag[i][j+1])
+                return true;
+            if( direction!=2 && board[i-1][j]=='O' && !flag[i-1][j]) {//上
+                if (search(board, flag, i - 1, j, 1)) {
+                    path[i - 1][j] = false;
+                    return true;
+                }
             }
+            if( direction!=4 && board[i][j-1]=='O' && !flag[i][j-1]) {//左
+                if (search(board, flag, i, j - 1, 3)){
+                    path[i][j-1] = false;
+                    return true;
+                }
+
+            }
+            if( direction!=1 && board[i+1][j]=='O' && !flag[i+1][j]) {//下
+                if (search(board, flag, i + 1, j, 2)){
+                    path[i+1][j] = false;
+                    return true;
+                }
+            }
+            if( direction!=3 && board[i][j+1]=='O' && !flag[i][j+1]) {//右
+                if (search(board, flag, i, j + 1, 4)){
+                    path[i][j+1] = false;
+                    return true;
+                }
+            }
+            path[i][j] = false;
+            return false;
+        }
+        public static void changeOtoX(char[][] board,int i,int j){
+            if(board[i-1][j]=='O'){
+                board[i-1][j]='X';
+                if(i-1!=0)
+                    changeOtoX(board,i-1,j);
+            }
+            if(board[i][j-1]=='O'){
+                board[i][j-1]='X';
+                if(j-1!=0)
+                    changeOtoX(board,i,j-1);
+            }
+            if(board[i+1][j]=='O'){
+                board[i+1][j]='X';
+                if(i+1!=board.length-1)
+                    changeOtoX(board,i+1,j);
+            }
+            if(board[i][j+1]=='O'){
+                board[i][j+1]='X';
+                if(j+1!=board[0].length-1)
+                    changeOtoX(board,i,j+1);
+            }
+        }
+
+        public static void changeFtoT(char[][] board,int i,int j,boolean[][] flag){
+            if(board[i-1][j]=='O' && !flag[i-1][j]){
+                flag[i-1][j] = true;
+                if(i-1!=0)
+                    changeFtoT(board,i-1,j,flag);
+            }
+
+            if(board[i+1][j]=='O' && !flag[i+1][j]){
+                flag[i+1][j] = true;
+                if(i+1!=board.length-1)
+                    changeFtoT(board,i+1,j,flag);
+            }
+
+            if(board[i][j-1]=='O' && !flag[i][j-1]){
+                flag[i][j-1] = true;
+                if(j-1!=0)
+                    changeFtoT(board,i,j-1,flag);
+            }
+
+            if(board[i][j+1]=='O' && !flag[i][j+1]){
+                flag[i][j+1] = true;
+                if(j+1!=board[0].length-1)
+                    changeFtoT(board,i,j+1,flag);
+            }
+        }
+    }//算法时间复杂度过慢
+
+    public static class SumPath{
+//                        Definition for a binary tree node.
+        public static class TreeNode {
+             int val;
+             TreeNode left;
+             TreeNode right;
+             TreeNode(int x) { val = x; }
+        }
+
+        public static int sumNumbers(TreeNode root) {
+
+            if(root==null)
+                return 0;
+
+            return bfs(root,0);
+
+        }
+
+        public static int bfs(TreeNode root,int res){
+            int levelres = 0;
+            if(root.left==null&&root.right==null)
+                return root.val+res*10;
+            if(root.left!=null)
+                levelres += bfs(root.left,res*10+root.val);
+            if(root.right!=null)
+                levelres += bfs(root.right,res*10+root.val);
+            return levelres;
+        }
+
+        public static int getMultiple(int num){
+            int res = 1;
+
+            while (num>1)
+                res *= 10;
+
             return res;
         }
-    }// 0ms  100%
+    }//0ms
 
-    public static class BinaryTreeLevelOrder{
+    public static class SortedListToBinaryTree{
+
+//          Definition for singly-linked list.
+        public static class ListNode {
+              int val;
+              ListNode next;
+              ListNode() {}
+              ListNode(int val) { this.val = val; }
+              ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+        }
+
 
 //          Definition for a binary tree node.
-          public static class TreeNode {
+        public static class TreeNode {
               int val;
               TreeNode left;
               TreeNode right;
-              TreeNode(int x) { val = x; }
-          }
-
-        static List<List<Integer>> res = new ArrayList<>();
-        static List<Integer> temres = new ArrayList<>();
-        static List<TreeNode> seqr = new ArrayList<>();
-        static List<TreeNode> preseqr = new ArrayList<>();
-
-        public static List<List<Integer>> levelOrder(TreeNode root) {
-
-            if(root==null)
-                return res;
-
-            preseqr.add(root);
-
-            helper();
-
-            return res;
+              TreeNode() {}
+              TreeNode(int val) { this.val = val; }
+              TreeNode(int val, TreeNode left, TreeNode right) {
+                  this.val = val;
+                  this.left = left;
+                  this.right = right;
+              }
         }
-        public static void helper(){
 
+        public static TreeNode sortedListToBST(ListNode head) {
 
-            if(preseqr.size()==0)
-                return;
+            TreeNode root = null;
 
-            for(TreeNode node:preseqr)
-                    temres.add(node.val);
+            if(head==null)
+                return null;
+            if(head.next==null)
+                return new TreeNode(head.val);
 
-            res.add(new ArrayList<>(temres));
-            temres.clear();
+            root = helper(head);
 
-            for(TreeNode node:preseqr){
-                if(node.left!=null)
-                    seqr.add(node.left);
-                if(node.right!=null)
-                    seqr.add(node.right);
+            return root;
+
+        }
+        //第一个要加入树   第二个不用加入树
+        public static TreeNode helper(ListNode head){
+            if(head==null)
+                return null;
+            if(head.next==null)
+                return new TreeNode(head.val);
+            ListNode fast = head;
+            ListNode slow = head;
+            ListNode preslow = head;
+
+            TreeNode root = null;
+
+            while (fast!=null){
+                if(fast.next==null)
+                    break;
+                fast = fast.next.next;
+                preslow = slow;
+                slow = slow.next;
             }
-            if(seqr.size()==0)
-                return;
-            preseqr.clear();
-            preseqr.addAll(seqr);
-            seqr.clear();
-            helper();
 
+            root = new TreeNode(slow.val);
+            ListNode next = slow.next;//记录整个右子树的 链表的  头节点
+            preslow.next = null;//在slow的前面一个节点进行 将链表切割
+
+            root.left = helper(head);
+            root.right = helper(next);
+            return root;
         }
-    }//1ms 93%
 
-
-
+    }//快慢指针   将有序链表转换为平衡二叉搜索树   0ms
 }
-
-
