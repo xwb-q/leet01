@@ -1,34 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="55f99e5e-532f-4d1f-a6df-a6e7a325fc1f" name="Default Changelist" comment="2.0">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/description.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/project-template.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/leet.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/leet/META-INF/leet.kotlin_module" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/out/production/leet/com/leet/test.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/com/leet/test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main$CanIWin.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main$CombinationSumIV.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main$IsNumber.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main$IsSubsequence.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main$SortColor.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main$WiggleSubsqquence.class" beforeDir="false" />
+    <list default="true" id="55f99e5e-532f-4d1f-a6df-a6e7a325fc1f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/leet/com/leet/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/leet/com/leet/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/com/leet/BlockingQueue/MyArrayBlockingQueue.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/leet/BlockingQueue/MyArrayBlockingQueue.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/com/leet/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/com/leet/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CoverageViewManager">
+    <option name="myElementSize" value="235" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -100,7 +84,7 @@
     </option>
   </component>
   <component name="StructureViewFactory">
-    <option name="ACTIVE_ACTIONS" value=",SHOW_NON_PUBLIC,ALPHA_COMPARATOR,SHOW_PROPERTIES" />
+    <option name="ACTIVE_ACTIONS" value=",ALPHA_COMPARATOR,SHOW_PROPERTIES,SHOW_INTERFACES,SHOW_INHERITED" />
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -220,7 +204,15 @@
       <workItem from="1608871943180" duration="8132000" />
       <workItem from="1608899357911" duration="2686000" />
       <workItem from="1608947498675" duration="7881000" />
-      <workItem from="1609217035075" duration="8089000" />
+      <workItem from="1609217035075" duration="8883000" />
+      <workItem from="1609674017612" duration="6112000" />
+      <workItem from="1609722844983" duration="1795000" />
+      <workItem from="1609808567502" duration="1170000" />
+      <workItem from="1609893379522" duration="11082000" />
+      <workItem from="1609981243314" duration="3001000" />
+      <workItem from="1610366091480" duration="1180000" />
+      <workItem from="1610411157910" duration="23471000" />
+      <workItem from="1610585127837" duration="674000" />
     </task>
     <task id="LOCAL-00001" summary="2.0">
       <created>1607413947967</created>
@@ -250,7 +242,14 @@
       <option name="project" value="LOCAL" />
       <updated>1608087033571</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="2.0">
+      <created>1609228189312</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1609228189312</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -260,9 +259,9 @@
     <ignored-roots>
       <path value="$PROJECT_DIR$/src/com/leet/SpinLockDemo" />
     </ignored-roots>
-    <MESSAGE value="2.0" />
     <MESSAGE value="2020-12-16" />
-    <option name="LAST_COMMIT_MESSAGE" value="2020-12-16" />
+    <MESSAGE value="2.0" />
+    <option name="LAST_COMMIT_MESSAGE" value="2.0" />
   </component>
   <component name="WindowStateProjectService">
     <state x="536" y="371" key="#Deployment" timestamp="1607413815391">
@@ -273,22 +272,22 @@
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
     <state x="955" y="502" key="#com.intellij.codeInsight.template.impl.EditVariableDialog/62.0.1858.1080@62.0.1858.1080" timestamp="1607417113551" />
-    <state x="796" y="249" key="#com.intellij.ide.util.MemberChooser" timestamp="1607600725937">
+    <state x="796" y="249" width="546" height="582" key="#com.intellij.ide.util.MemberChooser" timestamp="1609981575012">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state x="796" y="249" key="#com.intellij.ide.util.MemberChooser/62.0.1858.1080@62.0.1858.1080" timestamp="1607600725937" />
-    <state x="567" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog" timestamp="1601259683410">
+    <state x="796" y="249" width="546" height="582" key="#com.intellij.ide.util.MemberChooser/62.0.1858.1080@62.0.1858.1080" timestamp="1609981575012" />
+    <state x="779" y="247" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog" timestamp="1609679924527">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state x="567" y="0" key="#com.intellij.refactoring.rename.AutomaticRenamingDialog/62.0.1858.1080@62.0.1858.1080" timestamp="1601259683410" />
-    <state x="600" y="153" width="775" height="531" key="CommitChangelistDialog2" timestamp="1608087029723">
+    <state x="779" y="247" key="#com.intellij.refactoring.move.moveMembers.MoveMembersDialog/62.0.1858.1080@62.0.1858.1080" timestamp="1609679924527" />
+    <state x="600" y="153" width="775" height="531" key="CommitChangelistDialog2" timestamp="1609228184109">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state x="600" y="153" width="775" height="531" key="CommitChangelistDialog2/62.0.1858.1080@62.0.1858.1080" timestamp="1608087029723" />
-    <state width="410" height="466" key="DebuggerActiveHint" timestamp="1607605746319">
+    <state x="600" y="153" width="775" height="531" key="CommitChangelistDialog2/62.0.1858.1080@62.0.1858.1080" timestamp="1609228184109" />
+    <state width="434" height="466" key="DebuggerActiveHint" timestamp="1610535558029">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="410" height="466" key="DebuggerActiveHint/62.0.1858.1080@62.0.1858.1080" timestamp="1607605746319" />
+    <state width="434" height="466" key="DebuggerActiveHint/62.0.1858.1080@62.0.1858.1080" timestamp="1610535558029" />
     <state x="237" y="0" key="DiffContextDialog" timestamp="1607428072642">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
@@ -305,38 +304,38 @@
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
     <state x="804" y="248" key="Github.UntrackedFilesDialog/62.0.1858.1080@62.0.1858.1080" timestamp="1607413646638" />
-    <state width="1815" height="296" key="GridCell.Tab.0.bottom" timestamp="1609224775180">
+    <state width="1815" height="296" key="GridCell.Tab.0.bottom" timestamp="1610545387317">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="296" key="GridCell.Tab.0.bottom/62.0.1858.1080@62.0.1858.1080" timestamp="1609224775180" />
-    <state width="1815" height="296" key="GridCell.Tab.0.center" timestamp="1609224775179">
+    <state width="1815" height="296" key="GridCell.Tab.0.bottom/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387317" />
+    <state width="1815" height="296" key="GridCell.Tab.0.center" timestamp="1610545387317">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="296" key="GridCell.Tab.0.center/62.0.1858.1080@62.0.1858.1080" timestamp="1609224775179" />
-    <state width="1815" height="296" key="GridCell.Tab.0.left" timestamp="1609224775179">
+    <state width="1815" height="296" key="GridCell.Tab.0.center/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387317" />
+    <state width="1815" height="296" key="GridCell.Tab.0.left" timestamp="1610545387317">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="296" key="GridCell.Tab.0.left/62.0.1858.1080@62.0.1858.1080" timestamp="1609224775179" />
-    <state width="1815" height="296" key="GridCell.Tab.0.right" timestamp="1609224775179">
+    <state width="1815" height="296" key="GridCell.Tab.0.left/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387317" />
+    <state width="1815" height="296" key="GridCell.Tab.0.right" timestamp="1610545387317">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="296" key="GridCell.Tab.0.right/62.0.1858.1080@62.0.1858.1080" timestamp="1609224775179" />
-    <state width="1815" height="415" key="GridCell.Tab.1.bottom" timestamp="1609224610581">
+    <state width="1815" height="296" key="GridCell.Tab.0.right/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387317" />
+    <state width="1815" height="298" key="GridCell.Tab.1.bottom" timestamp="1610545387308">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="415" key="GridCell.Tab.1.bottom/62.0.1858.1080@62.0.1858.1080" timestamp="1609224610581" />
-    <state width="1815" height="415" key="GridCell.Tab.1.center" timestamp="1609224610580">
+    <state width="1815" height="298" key="GridCell.Tab.1.bottom/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387308" />
+    <state width="1815" height="298" key="GridCell.Tab.1.center" timestamp="1610545387308">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="415" key="GridCell.Tab.1.center/62.0.1858.1080@62.0.1858.1080" timestamp="1609224610580" />
-    <state width="1815" height="415" key="GridCell.Tab.1.left" timestamp="1609224610580">
+    <state width="1815" height="298" key="GridCell.Tab.1.center/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387308" />
+    <state width="1815" height="298" key="GridCell.Tab.1.left" timestamp="1610545387308">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="415" key="GridCell.Tab.1.left/62.0.1858.1080@62.0.1858.1080" timestamp="1609224610580" />
-    <state width="1815" height="415" key="GridCell.Tab.1.right" timestamp="1609224610580">
+    <state width="1815" height="298" key="GridCell.Tab.1.left/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387308" />
+    <state width="1815" height="298" key="GridCell.Tab.1.right" timestamp="1610545387308">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state width="1815" height="415" key="GridCell.Tab.1.right/62.0.1858.1080@62.0.1858.1080" timestamp="1609224610580" />
+    <state width="1815" height="298" key="GridCell.Tab.1.right/62.0.1858.1080@62.0.1858.1080" timestamp="1610545387308" />
     <state x="813" y="477" key="ReplaceDuplicatesPrompt" timestamp="1607505852166">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
@@ -345,18 +344,22 @@
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
     <state x="213" y="298" width="1260" height="709" key="SettingsEditor/62.0.1858.1080@62.0.1858.1080" timestamp="1607424796855" />
-    <state x="583" y="276" key="Vcs.Push.Dialog.v2" timestamp="1607516931687">
+    <state x="583" y="276" key="Vcs.Push.Dialog.v2" timestamp="1609228202740">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state x="583" y="276" key="Vcs.Push.Dialog.v2/62.0.1858.1080@62.0.1858.1080" timestamp="1607516931687" />
+    <state x="583" y="276" key="Vcs.Push.Dialog.v2/62.0.1858.1080@62.0.1858.1080" timestamp="1609228202740" />
     <state x="82" y="106" width="1674" height="896" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1607428910302">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
     <state x="82" y="106" width="1674" height="896" key="com.intellij.history.integration.ui.views.FileHistoryDialog/62.0.1858.1080@62.0.1858.1080" timestamp="1607428910302" />
-    <state x="989" y="390" width="540" height="488" key="extract.method.dialog" timestamp="1607505843873">
+    <state x="646" y="158" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser" timestamp="1610438557159">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state x="989" y="390" width="540" height="488" key="extract.method.dialog/62.0.1858.1080@62.0.1858.1080" timestamp="1607505843873" />
+    <state x="646" y="158" key="com.intellij.openapi.editor.actions.MultiplePasteAction$ClipboardContentChooser/62.0.1858.1080@62.0.1858.1080" timestamp="1610438557159" />
+    <state x="989" y="390" width="540" height="488" key="extract.method.dialog" timestamp="1610441587766">
+      <screen x="62" y="0" width="1858" height="1080" />
+    </state>
+    <state x="989" y="390" width="540" height="488" key="extract.method.dialog/62.0.1858.1080@62.0.1858.1080" timestamp="1610441587766" />
     <state x="1112" y="335" width="626" height="490" key="find.popup" timestamp="1608037499595">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
@@ -369,10 +372,10 @@
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
     <state x="647" y="250" key="run.anything.popup/62.0.1858.1080@62.0.1858.1080" timestamp="1608637971132" />
-    <state x="1019" y="255" width="672" height="678" key="search.everywhere.popup" timestamp="1608385297456">
+    <state x="1019" y="255" width="672" height="678" key="search.everywhere.popup" timestamp="1609981270524">
       <screen x="62" y="0" width="1858" height="1080" />
     </state>
-    <state x="1019" y="255" width="672" height="678" key="search.everywhere.popup/62.0.1858.1080@62.0.1858.1080" timestamp="1608385297456" />
+    <state x="1019" y="255" width="672" height="678" key="search.everywhere.popup/62.0.1858.1080@62.0.1858.1080" timestamp="1609981270524" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -384,72 +387,78 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>1537</line>
+          <line>1842</line>
           <option name="timeStamp" value="112" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>1248</line>
+          <line>1553</line>
           <option name="timeStamp" value="132" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>1222</line>
+          <line>1527</line>
           <option name="timeStamp" value="134" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>1088</line>
+          <line>1393</line>
           <option name="timeStamp" value="137" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>1138</line>
+          <line>1443</line>
           <option name="timeStamp" value="139" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>698</line>
+          <line>1003</line>
           <option name="timeStamp" value="161" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>446</line>
+          <line>751</line>
           <option name="timeStamp" value="170" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>496</line>
+          <line>801</line>
           <option name="timeStamp" value="180" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>400</line>
+          <line>705</line>
           <option name="timeStamp" value="182" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>392</line>
+          <line>697</line>
           <option name="timeStamp" value="183" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>313</line>
+          <line>618</line>
           <option name="timeStamp" value="186" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
-          <line>128</line>
+          <line>452</line>
           <option name="timeStamp" value="194" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
+          <line>162</line>
+          <option name="timeStamp" value="206" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/com/leet/Main.java</url>
+          <line>211</line>
+          <option name="timeStamp" value="207" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
-    <watches-manager>
-      <configuration name="Application">
-        <watch expression="nums2[j]" language="JAVA" />
-        <watch expression="nums1[i]" language="JAVA" />
-        <watch expression="nums2[k]" language="JAVA" />
-      </configuration>
-    </watches-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/leet$Main.ic" NAME="Main Coverage Results" MODIFIED="1610543530035" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
   </component>
 </project>

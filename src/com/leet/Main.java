@@ -99,18 +99,342 @@ class ShareData{
     }
 }
 public class Main {
-    public static void main(String[] args) {
 
-//        10000000000
-//        2147483647
-//        List<Integer> list = LexicalOrder.lexicalOrder(13);
-//        [43024,99908]
-//[1864]
-        int res = NumTriplets.numTriplets(new int[]{43024,99908},new int[]{1864});
-//        System.out.println(43024*99908);
-        System.out.println(res);
+    public static void main(String[] args) {
+        List<String> expr1 = new ArrayList<>();
+        List<List<String>> equations = new ArrayList<>();
+        List<List<String>> quations = new ArrayList<>();
+        double[] values = {3.4d,1.4d,2.3d};
+        expr1.add("a");
+        expr1.add("b");
+
+        List<String> expr2 = new ArrayList<>();
+        expr2.add("e");
+        expr2.add("f");
+
+
+        List<String> expr3 = new ArrayList<>();
+        expr3.add("b");
+        expr3.add("e");
+
+        List<String> expr4 = new ArrayList<>();
+        expr4.add("b");
+        expr4.add("a");
+
+        List<String> expr5 = new ArrayList<>();
+        expr5.add("a");
+        expr5.add("f");
+
+        List<String> expr6 = new ArrayList<>();
+        expr6.add("f");
+        expr6.add("f");
+
+        List<String> expr7 = new ArrayList<>();
+        expr7.add("e");
+        expr7.add("e");
+
+        List<String> expr8 = new ArrayList<>();
+        expr8.add("c");
+        expr8.add("c");
+
+
+        List<String> expr9 = new ArrayList<>();
+        expr9.add("a");
+        expr9.add("c");
+
+        List<String> expr10 = new ArrayList<>();
+        expr10.add("f");
+        expr10.add("e");
+
+        equations.add(expr1);
+        equations.add(expr2);
+        equations.add(expr3);
+
+
+//        quations.add(expr3);
+        quations.add(expr4);
+        quations.add(expr5);
+        quations.add(expr6);
+        quations.add(expr7);
+        quations.add(expr8);
+        quations.add(expr9);
+        quations.add(expr10);
+        double[] doubles = CalcEquation.calcEquation(equations, values, quations);
         return;
     }
+
+
+
+    //思路一  过于缓慢
+    public static class CalcEquation{
+        //顶点域
+        static class Graph{
+            String data;//顶点域   存被除数
+            GraphNode firstarc;//指向边节点
+            Graph next;//指向下一个顶点域
+        }
+        static class GraphNode{
+            String graphname;//被除数的值
+            String adjvex;//临接点域  除数
+            double res; //  商
+            GraphNode next;//指向下一个临接点域
+        }
+        static HashSet<String> path = new HashSet<>();
+
+        public static double[] calcEquation(List<List<String>> equations, double[] values, List<List<String>> queries) {
+                Graph graph = new Graph();
+                int i = 0;
+                GraphNode tnode= new GraphNode();
+                //建立图
+                for(List<String> equation:equations){
+                    String s1 = equation.get(0);
+                    String s2 = equation.get(1);
+
+                    GraphNode node = new GraphNode();
+                    node.graphname = s1;
+                    node.adjvex = s2;
+                    node.res = values[i++];
+                    findSet(graph, s1, node);
+
+
+                    node = new GraphNode();
+                    node.graphname = s2;
+                    node.adjvex = s1;
+                    node.res = 1.0d / values[i-1];
+                    findSet(graph,s2,node);
+
+                }
+                double[] res = new double[queries.size()];
+
+                for(i = 0;i<queries.size();i++){
+                    path = new HashSet<>();
+                    path.add(queries.get(i).get(0));
+                    res[i] = findRes(graph,queries.get(i).get(0),queries.get(i).get(1));
+                }
+                return res;
+        }
+
+        private static void findSet(Graph graph, String s1, GraphNode node) {
+            GraphNode tnode;
+            Graph p = graph;
+            Graph g = findGraph(graph, s1);
+            if(g==null){
+                g = new Graph();
+                g.data = s1;
+                g.firstarc = node;
+                while (p.next!=null)
+                    p = p.next;
+                p.next = g;
+            }else{
+                tnode = g.firstarc;
+                if(tnode==null){
+                    g.firstarc = node;
+                }else{
+                    while (tnode.next!=null)
+                        tnode = tnode.next;
+                    tnode.next = node;
+                }
+            }
+
+            p = graph;
+            HashSet<String> set = new HashSet<>();
+            while (p!=null){
+                GraphNode node1 = p.firstarc;
+                while (node1!=null){
+                    if(node1.adjvex.equals(node.graphname) && !set.contains(node.adjvex) ){
+                        tnode = new GraphNode();
+                        tnode.graphname = node1.graphname;
+                        tnode.adjvex = node.adjvex;
+                        tnode.res = node1.res * node.res;
+                        tnode.next = node1.next;
+                        node1.next = tnode;
+                    }
+                    set.add(node1.adjvex);
+                    node1 = node1.next;
+                }
+                p = p.next;
+            }
+        }
+
+        public static Double findRes(Graph g, String s1, String s2){
+
+            if(findGraph(g,s1)==null || findGraph(g,s2)==null)
+                return -1d;
+
+            if(s1.equals(s2))
+                return 1d;
+
+            Graph p = g;
+            while ( p.next!=null && !s1.equals(p.data) )
+                    p = p.next;
+            if( s1.equals(p.data) ){
+                GraphNode node = p.firstarc;
+                if(node!=null && !s2.equals(node.adjvex)){
+                    while (node.next!=null){
+                        if(s2.equals(node.next.adjvex))
+                            return node.next.res;
+                        node = node.next;
+                    }
+                    //此时找到了 s1  到没从s1的记录里面找到 s2 node.next=null
+                    //通过传递性  寻找res
+                    Double res =  find(g,p,s1,s2);
+                    //如果不为空，则说明可以传递过来，如果还是为空，就说明无法通过传递得到  也就是求不出来
+                    if(res!=null){
+                        GraphNode node1 = new GraphNode();
+                        node1.adjvex = s2;
+                        node1.res = res;
+                        //头插法
+                        node1.next = p.firstarc;
+                        p.firstarc = node1;
+                        return res;
+                    }
+                }else if(node==null)
+                    return -1d;
+                else if(s2.equals(node.adjvex))
+                    return node.res;
+            }
+            return -1d;
+        }
+
+        /**
+         *
+         * @param g 图
+         * @param p 图  包含s1值的 图的头节点
+         * @param s1  被除数（已经找到）
+         * @param s2  除数 （暂时未找到）
+         * @return
+         */
+        public static Double find(Graph g,Graph p,String s1,String s2){
+
+            GraphNode node = p.firstarc;
+            while (node!=null){
+                if(!node.adjvex.equals(s1)) {
+                    Graph graph = findGraph(g, node.adjvex);
+                    if (graph != null && !path.contains(node.adjvex) ) {
+
+                        Double res = findRes(g, node.adjvex, s2);
+                        if (res != null)
+                            return node.res * res;
+                    }
+                    node = node.next;
+                }
+            }
+            return null;
+        }
+
+        /**
+         *
+         * @param g  全图
+         * @param s1  索要寻找的头节点
+         * @return
+         */
+        public static Graph findGraph(Graph g, String s1){
+            Graph p = g;
+            while (p!=null && !s1.equals(p.data))
+                p = p.next;
+            return p==null?null:p;
+        }
+
+    }//399
+
+    public static class CalcEquationII{
+        //顶点域
+        static class Graph{
+            String data;//顶点域   存被除数
+            CalcEquation.GraphNode firstarc;//指向边节点
+            CalcEquation.Graph next;//指向下一个顶点域
+        }
+        static class GraphNode{
+            String graphname;//被除数的值
+            String adjvex;//临接点域  除数
+            double res; //  商
+            CalcEquation.GraphNode next;//指向下一个临接点域
+        }
+    }
+
+    public static class RemoveInvalidParentheses{
+
+        public List<String> res = new ArrayList<>();
+        public List<Character> seqr = new ArrayList<>();
+        public Stack<Character> stack = new Stack<>();
+        public List<String> removeInvalidParentheses(String s) {
+            if(s.isEmpty()||"".equals(s))
+                return res;
+            helper(s);
+            return res;
+        }
+
+        public void helper(String s){
+            if(s.length()==0)
+                return;
+            char[] cs = s.toCharArray();
+            for(char c:cs){
+                if(c=='('){
+                    stack.push(c);
+                    seqr.add(c);
+                }else if(c==')'){
+                    if(stack.peek()=='('){
+                        stack.pop();
+                        seqr.add(c);
+                    }
+                }
+            }
+        }
+
+    }//301  删除无效括号  未完待续
+
+    public static class IsPowerOfTwo{
+        public static boolean isPowerOfTwo(int n) {
+            return ( n&(n-1) ) == 0 ;
+        }
+    }
+
+    public static class NPreorder{
+        class Node {
+            public int val;
+            public List<Node> children;
+
+            public Node() {}
+
+            public Node(int _val) {
+                val = _val;
+            }
+
+            public Node(int _val, List<Node> _children) {
+                val = _val;
+                children = _children;
+            }
+        }
+        public List<Integer> res = new ArrayList<>();
+        public List<Integer> preorder(Node root) {
+            if(root==null)
+                return res;
+            helper(root);
+            return res;
+        }
+        public void helper(Node root){
+            if(root==null)
+                return;
+            res.add(root.val);
+            for(Node child : root.children)
+                helper(child);
+        }//递归版本
+
+        public void helperII(Node root){
+            Stack<Node> stack = new Stack<>();
+            stack.push(root);
+            Node p = null;
+            while (!stack.isEmpty()){
+                p = stack.pop();
+                if(p==null)
+                    continue;
+                res.add(p.val);
+                for(int i = p.children.size()-1;i>=0;i--)
+                    stack.push(p.children.get(i));
+            }
+        }//迭代
+    }
+
 
     /**
      *三元组 (i, j, k) ，如果 nums1[i]2 == nums2[j] * nums2[k] 其中 0 <= i < nums1.length 且 0 <= j < k < nums2.length
@@ -173,11 +497,6 @@ public class Main {
             return sum;
         }
     }//1577   6ms 92.07
-
-
-
-
-
 
 
     public static class LexicalOrder{
